@@ -20,6 +20,7 @@ contains the catalogue code, guideline ID, quoted note evidence and confidence
 factors. `trace` records corpus hashes, retrieval hits, extracted facts and
 policy branches. No model key is required; an LLM adapter would be an optional
 future proposer whose output must pass the same policy and evidence checks.
+The output contract is documented in `schema/result.schema.json`.
 
 `docker compose up` builds and runs the included smoke file. To run a supplied
 file in the container from PowerShell, use

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/evidence-constrained-coding/result.schema.json",
+  "title": "Coding result",
+  "type": "object",
+  "required": ["schema_version", "note_id", "input_position", "status", "confidence", "assignments", "problems", "trace"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "note_id": {"type": "string"},
+    "input_position": {"type": "integer", "minimum": 1},
+    "input_quality": {"type": "array", "items": {"type": "string"}},
+    "status": {"enum": ["accepted", "provisional", "review", "unresolved"]},
+    "confidence": {"enum": ["high", "moderate", "low"]},
+    "confidence_factors": {"type": "object"},
+    "assignments": {"type": "array", "items": {"$ref": "#/$defs/candidate"}},
+    "candidates": {"type": "array", "items": {"$ref": "#/$defs/candidate"}},
+    "problems": {"type": "array", "items": {"type": "object"}},
+    "missing_information": {"type": "array", "items": {"type": "string"}},
+    "unresolved_reasons": {"type": "array", "items": {"type": "string"}},
+    "safety_flags": {"type": "array", "items": {"type": "string"}},
+    "trace": {"type": "object"}
+  },
+  "$defs": {
+    "candidate": {
+      "type": "object",
+      "required": ["code", "title", "guideline_id", "confidence", "support", "evidence"],
+      "properties": {
+        "code": {"type": "string"},
+        "title": {"type": "string"},
+        "guideline_id": {"type": "string"},
+        "role": {"type": "string"},
+        "provisional": {"type": "boolean"},
+        "score": {"type": "number"},
+        "confidence": {"enum": ["high", "moderate", "low"]},
+        "support": {"type": "string"},
+        "missing_information": {"type": "array", "items": {"type": "string"}},
+        "blockers": {"type": "array", "items": {"type": "string"}},
+        "evidence": {"type": "array", "items": {"type": "object"}}
+      }
+    }
+  }
+}
