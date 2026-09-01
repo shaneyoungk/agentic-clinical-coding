@@ -125,8 +125,12 @@ def _metadata_for_guideline(record: dict[str, Any]) -> tuple[str, str]:
     derived_trust = "untrusted" if any(
         marker in haystack for marker in ("unsigned", "system directive", "processing assistant")
     ) else "normal"
-    status = record.get("status", derived_status)
-    trust = record.get("trust", derived_trust)
+    # Explicit metadata may add lifecycle information, but it cannot make a
+    # record active/trusted when its own content carries a clear downgrade
+    # signal. This prevents a migrated document from self-certifying around
+    # the safety check.
+    status = "deprecated" if derived_status == "deprecated" else record.get("status", derived_status)
+    trust = "untrusted" if derived_trust == "untrusted" else record.get("trust", derived_trust)
     if status not in {"active", "deprecated"}:
         raise CorpusError(f"invalid guideline status: {status!r}")
     if trust not in {"normal", "untrusted"}:
