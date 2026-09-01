@@ -148,6 +148,18 @@ class CodingPolicy:
         return store.first_positive(*concepts)
 
     @staticmethod
+    def _fact_current(store: FactStore, *concepts: str) -> Fact | None:
+        for concept in concepts:
+            for fact in store.matching(concept):
+                if fact.experiencer == "patient" and fact.temporality == "current" and fact.assertion in {"present", "possible"}:
+                    return fact
+        return None
+
+    @staticmethod
+    def _present_or_possible(store: FactStore, *concepts: str) -> bool:
+        return CodingPolicy._fact_current(store, *concepts) is not None
+
+    @staticmethod
     def _historical(store: FactStore, concept: str) -> bool:
         return any(f.experiencer == "patient" and f.assertion in {"present", "historical"} for f in store.matching(concept))
 
@@ -162,6 +174,11 @@ class CodingPolicy:
                 return float(months) / 12.0
         if isinstance(value, dict):
             value = value.get("value")
+        if value is None:
+            for fact in store.matching(concept):
+                if fact.experiencer == "patient" and fact.temporality == "current" and fact.assertion == "possible" and isinstance(fact.value, dict):
+                    value = fact.value.get("value")
+                    break
         return float(value) if isinstance(value, (int, float)) else None
 
     @staticmethod
@@ -267,8 +284,10 @@ class CodingPolicy:
             facts = [self._fact(store, "allergen_exposure"), self._fact(store, "skin_change", "mucosal_change"), self._fact(store, "respiratory_compromise", "hypotension")]
             self._add(results, self._candidate(store, ("Anaphylaxis",), ("Anaphylaxis",), .99, "acute allergen exposure plus skin/mucosal involvement and respiratory or circulatory compromise", [f for f in facts if f], flags=("treat_first_emergency",)), trace, "anaphylaxis")
 
-        if self._pos(store, "infection") and (self._pos(store, "altered_mentation", "oliguria", "raised_lactate") or self._at_most(store, "systolic_bp", 100) or self._at_least(store, "respiratory_rate", 22)):
-            facts = [self._fact(store, "infection"), self._fact(store, "altered_mentation", "oliguria", "raised_lactate"), self._fact(store, "systolic_bp"), self._fact(store, "respiratory_rate")]
+        infection_supported = self._present_or_possible(store, "infection")
+        organ_dysfunction = self._present_or_possible(store, "altered_mentation", "oliguria", "raised_lactate") or self._at_most(store, "systolic_bp", 100) or self._at_least(store, "respiratory_rate", 22)
+        if infection_supported and organ_dysfunction:
+            facts = [self._fact_current(store, "infection"), self._fact_current(store, "altered_mentation", "oliguria", "raised_lactate"), self._fact_current(store, "systolic_bp"), self._fact_current(store, "respiratory_rate")]
             shock = self._pos(store, "fluid_resuscitation") and self._pos(store, "vasopressors") and (self._pos(store, "hypotension") or self._at_most(store, "systolic_bp", 100))
             code_terms = ("Septic shock",) if shock else ("Sepsis", "without septic shock")
             self._add(results, self._candidate(store, code_terms, ("Sepsis",), .98 if shock else .91, "documented or strongly suspected infection with organ dysfunction" + (" and persistent hypotension requiring vasopressors" if shock else ""), [f for f in facts if f], flags=("time_critical",),), trace, "septic-shock" if shock else "sepsis")
@@ -425,12 +444,12 @@ class CodingPolicy:
 
         # Pneumonia uses the active confirmation revision. Clinical evidence is
         # deliberately provisional until consolidation is imaged.
-        pneumonia_features = p(store, "fever") and p(store, "cough") and p(store, "crackles") and p(store, "dullness")
+        pneumonia_features = p(store, "fever") and p(store, "productive_cough") and p(store, "crackles", "dullness")
         if p(store, "pneumonia") or pneumonia_features:
             if p(store, "consolidation") and p(store, "chest_imaging", "radiology_confirmed"):
                 self._add(results, self._candidate(store, ("Pneumonia",), ("Confirmation standard for pneumonia",), .91, "pneumonia supported by radiographic or point-of-care ultrasound consolidation", [f(store, "pneumonia"), f(store, "consolidation"), f(store, "chest_imaging", "radiology_confirmed")], role="source"), trace, "pneumonia-confirmed")
             elif pneumonia_features:
-                self._add(results, self._candidate(store, ("Pneumonia",), ("Confirmation standard for pneumonia",), .76, "fever, productive cough and focal auscultatory findings support pneumonia but imaging confirmation is absent", [f(store, "fever"), f(store, "cough"), f(store, "crackles"), f(store, "dullness")], confidence="moderate", missing=("radiographic or point-of-care ultrasound confirmation of consolidation",), flags=("provisional_until_imaging",), provisional=True, role="source"), trace, "pneumonia-provisional")
+                self._add(results, self._candidate(store, ("Pneumonia",), ("Confirmation standard for pneumonia",), .76, "fever, productive cough and focal auscultatory findings support pneumonia but imaging confirmation is absent", [f(store, "fever"), f(store, "productive_cough"), f(store, "crackles", "dullness")], confidence="moderate", missing=("radiographic or point-of-care ultrasound confirmation of consolidation",), flags=("provisional_until_imaging",), provisional=True, role="source"), trace, "pneumonia-provisional")
             elif not (p(store, "infection") and (p(store, "altered_mentation", "oliguria", "raised_lactate") or self._at_most(store, "systolic_bp", 100) or self._at_least(store, "respiratory_rate", 22))):
                 self._add(results, self._candidate(store, ("Pneumonia",), ("Confirmation standard for pneumonia",), .54, "pneumonia is mentioned without the active confirmation standard", [f(store, "pneumonia")], confidence="low", blockers=("imaging confirmation or qualifying clinical findings are missing",), missing=("chest imaging and complete respiratory examination",)), trace, "pneumonia-unsupported")
 
@@ -471,10 +490,11 @@ class CodingPolicy:
             self._add(results, self._candidate(store, ("Medication-overuse headache",), ("Medication-overuse headache",), .94, "headache and medication-use frequency thresholds sustained for more than three months", [f(store, "headache"), f(store, "medication_overuse"), f(store, "headache_days_per_month"), f(store, "medication_days_per_month"), f(store, "duration_months")]), trace, "medication-overuse-headache")
 
         # Pregnancy bleeding and hypertensive disease.
-        if p(store, "pregnancy") and p(store, "bleeding_early_pregnancy"):
+        early_pregnancy_context = p(store, "pregnancy") or (p(store, "amenorrhoea") and p(store, "bleeding_early_pregnancy"))
+        if early_pregnancy_context and p(store, "bleeding_early_pregnancy"):
             if p(store, "closed_os") and p(store, "viable_iup"):
                 self._add(results, self._candidate(store, ("Threatened abortion",), ("Threatened miscarriage and ectopic",), .93, "early-pregnancy bleeding with closed os and viable intrauterine pregnancy", [f(store, "bleeding_early_pregnancy"), f(store, "closed_os"), f(store, "viable_iup")]), trace, "threatened-miscarriage")
-            elif p(store, "pelvic_pain", "unilateral") and p(store, "haemodynamic_change", "orthostatic_change") and not p(store, "viable_iup"):
+            elif p(store, "pelvic_pain", "unilateral") and p(store, "haemodynamic_change", "orthostatic_change") and 6 <= (self._number(store, "gestational_weeks") or self._number(store, "duration_weeks") or 0) <= 8 and not p(store, "viable_iup"):
                 self._add(results, self._candidate(store, ("Ectopic pregnancy",), ("Threatened miscarriage and ectopic",), .90, "early-pregnancy bleeding and unilateral pelvic pain with haemodynamic change before intrauterine visualisation", [f(store, "bleeding_early_pregnancy"), f(store, "pelvic_pain", "unilateral"), f(store, "orthostatic_change")], flags=("urgent_review",)), trace, "ectopic-pregnancy")
             else:
                 self._add(results, self._candidate(store, ("Threatened abortion",), ("Threatened miscarriage and ectopic",), .55, "pregnancy bleeding does not yet distinguish threatened miscarriage from ectopic pregnancy", [f(store, "bleeding_early_pregnancy")], confidence="low", blockers=("cervical-os status, ultrasound location/viability and haemodynamic status are unresolved",), flags=("urgent_review",)), trace, "pregnancy-bleeding-uncertain")
