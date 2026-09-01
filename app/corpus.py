@@ -1,0 +1,198 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+from .models import CodeEntry, Guideline
+
+
+class CorpusError(ValueError):
+    """Raised when the coding corpus cannot be safely loaded."""
+
+
+@dataclass(frozen=True)
+class Corpus:
+    catalogue: tuple[CodeEntry, ...]
+    guidelines: tuple[Guideline, ...]
+    hashes: dict[str, str]
+    catalogue_version: str = "provided"
+
+    @property
+    def code_by_code(self) -> dict[str, CodeEntry]:
+        return {entry.code: entry for entry in self.catalogue}
+
+    @property
+    def guideline_by_id(self) -> dict[str, Guideline]:
+        return {guideline.id: guideline for guideline in self.guidelines}
+
+    def active_guidelines(self, as_of: str | None = None) -> tuple[Guideline, ...]:
+        """Return current trusted guidance, applying explicit lifecycle signals.
+
+        The supplied snippets do not carry a formal supersession field. We
+        therefore derive a narrow, explainable replacement rule from prose:
+        a newer pneumonia confirmation document that says it replaces the old
+        standard supersedes older pneumonia confirmation snippets. This is a
+        corpus-level relationship, not a note/code special case.
+        """
+        as_of_key = _date_key(as_of) if as_of else None
+        eligible = [
+            item
+            for item in self.guidelines
+            if item.status == "active"
+            and item.trust == "normal"
+            and (as_of_key is None or item.effective_key <= as_of_key)
+        ]
+        replacements: set[str] = set()
+        for newer in eligible:
+            body = f"{newer.title} {newer.text}".lower()
+            if "replaces" not in body:
+                continue
+            if "pneumonia" in body and "confirmation" in body:
+                for older in eligible:
+                    if older.id != newer.id and "pneumonia" in f"{older.title} {older.text}".lower():
+                        if older.effective_key < newer.effective_key:
+                            replacements.add(older.id)
+        return tuple(item for item in eligible if item.id not in replacements)
+
+    def searchable_guidelines(self) -> tuple[Guideline, ...]:
+        """Include historical/untrusted documents for audit retrieval."""
+        return self.guidelines
+
+
+def _date_key(value: str | None) -> int | None:
+    if value is None:
+        return None
+    if not re.fullmatch(r"\d{4}-\d{2}(?:-\d{2})?", value):
+        raise CorpusError(f"invalid date: {value!r}; expected YYYY-MM or YYYY-MM-DD")
+    year, month = value[:7].split("-")
+    month_int = int(month)
+    if not 1 <= month_int <= 12:
+        raise CorpusError(f"invalid month in date: {value!r}")
+    return int(year) * 100 + month_int
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _read_json(path: Path) -> Any:
+    try:
+        return json.loads(path.read_text(encoding="utf-8-sig"))
+    except FileNotFoundError as exc:
+        raise CorpusError(f"corpus file not found: {path}") from exc
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise CorpusError(f"invalid JSON corpus file {path}: {exc}") from exc
+
+
+def _metadata_for_guideline(record: dict[str, Any]) -> tuple[str, str]:
+    haystack = " ".join(
+        str(record.get(key, "")) for key in ("title", "source", "text")
+    ).lower()
+    status = "deprecated" if "deprecated" in haystack or "historical reference" in haystack else "active"
+    trust = "untrusted" if any(
+        marker in haystack for marker in ("unsigned", "system directive", "processing assistant")
+    ) else "normal"
+    return status, trust
+
+
+def load_catalogue(path: str | Path) -> tuple[CodeEntry, ...]:
+    file_path = Path(path)
+    data = _read_json(file_path)
+    if not isinstance(data, list):
+        raise CorpusError(f"catalogue must be a JSON list: {file_path}")
+    entries: list[CodeEntry] = []
+    seen: set[str] = set()
+    code_pattern = re.compile(r"^[A-Z0-9][A-Z0-9.]*$")
+    for index, record in enumerate(data):
+        if not isinstance(record, dict):
+            raise CorpusError(f"catalogue record {index} is not an object")
+        for key in ("code", "title", "chapter", "synonyms"):
+            if key not in record:
+                raise CorpusError(f"catalogue record {index} missing {key!r}")
+        code = record["code"]
+        title = record["title"]
+        chapter = record["chapter"]
+        synonyms = record["synonyms"]
+        if not isinstance(code, str) or not code_pattern.fullmatch(code):
+            raise CorpusError(f"invalid catalogue code at record {index}: {code!r}")
+        if code in seen:
+            raise CorpusError(f"duplicate catalogue code: {code}")
+        if not isinstance(title, str) or not title.strip() or not isinstance(chapter, str):
+            raise CorpusError(f"invalid title/chapter at catalogue record {index}")
+        if not isinstance(synonyms, list) or any(not isinstance(item, str) for item in synonyms):
+            raise CorpusError(f"invalid synonyms at catalogue record {index}")
+        seen.add(code)
+        entries.append(CodeEntry(code, title.strip(), chapter.strip(), tuple(s.strip() for s in synonyms if s.strip())))
+    return tuple(entries)
+
+
+def load_guidelines(path: str | Path) -> tuple[Guideline, ...]:
+    file_path = Path(path)
+    data = _read_json(file_path)
+    if not isinstance(data, list):
+        raise CorpusError(f"guidelines must be a JSON list: {file_path}")
+    guidelines: list[Guideline] = []
+    seen: set[str] = set()
+    for index, record in enumerate(data):
+        if not isinstance(record, dict):
+            raise CorpusError(f"guideline record {index} is not an object")
+        for key in ("id", "title", "source", "effective", "text"):
+            if key not in record:
+                raise CorpusError(f"guideline record {index} missing {key!r}")
+        identifier = record["id"]
+        if not isinstance(identifier, str) or not identifier.strip() or identifier in seen:
+            raise CorpusError(f"invalid or duplicate guideline ID: {identifier!r}")
+        if not all(isinstance(record[key], str) and record[key].strip() for key in ("title", "source", "text")):
+            raise CorpusError(f"invalid guideline text metadata at record {index}")
+        effective = record["effective"]
+        _date_key(effective)
+        status, trust = _metadata_for_guideline(record)
+        seen.add(identifier)
+        guidelines.append(Guideline(
+            id=identifier.strip(),
+            title=record["title"].strip(),
+            source=record["source"].strip(),
+            effective=effective,
+            text=record["text"].strip(),
+            status=status,
+            trust=trust,
+        ))
+    return tuple(guidelines)
+
+
+def load_corpus(
+    catalogue_path: str | Path,
+    guideline_path: str | Path,
+    *,
+    extra_catalogue_paths: tuple[str | Path, ...] = (),
+    extra_guideline_paths: tuple[str | Path, ...] = (),
+) -> Corpus:
+    catalogue = list(load_catalogue(catalogue_path))
+    guidelines = list(load_guidelines(guideline_path))
+    seen_codes = {item.code for item in catalogue}
+    for extra_path in extra_catalogue_paths:
+        for item in load_catalogue(extra_path):
+            if item.code in seen_codes:
+                existing = next(entry for entry in catalogue if entry.code == item.code)
+                if (existing.title, existing.chapter) != (item.title, item.chapter):
+                    raise CorpusError(f"external code collision for {item.code}")
+                continue
+            catalogue.append(item)
+            seen_codes.add(item.code)
+    seen_ids = {item.id for item in guidelines}
+    for extra_path in extra_guideline_paths:
+        for item in load_guidelines(extra_path):
+            if item.id in seen_ids:
+                raise CorpusError(f"external guideline collision for {item.id}")
+            guidelines.append(item)
+            seen_ids.add(item.id)
+    paths = [Path(catalogue_path), Path(guideline_path)] + [Path(p) for p in extra_catalogue_paths + extra_guideline_paths]
+    return Corpus(
+        catalogue=tuple(catalogue),
+        guidelines=tuple(guidelines),
+        hashes={str(path): _sha256(path) for path in paths},
+    )

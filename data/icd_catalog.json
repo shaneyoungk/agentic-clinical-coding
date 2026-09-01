@@ -1,0 +1,3202 @@
+[
+  {
+    "code": "1A00",
+    "title": "Cholera",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "vibrio cholerae infection"
+    ]
+  },
+  {
+    "code": "1A03",
+    "title": "Shigellosis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "bacillary dysentery"
+    ]
+  },
+  {
+    "code": "1A04",
+    "title": "Salmonella enteritis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "non-typhoidal salmonellosis"
+    ]
+  },
+  {
+    "code": "1A07",
+    "title": "Typhoid fever",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "enteric fever",
+      "salmonella typhi infection"
+    ]
+  },
+  {
+    "code": "1A09",
+    "title": "Campylobacter enteritis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": []
+  },
+  {
+    "code": "1A0A",
+    "title": "Escherichia coli enteritis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "E coli gastroenteritis"
+    ]
+  },
+  {
+    "code": "1A20",
+    "title": "Amoebiasis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "entamoeba histolytica infection"
+    ]
+  },
+  {
+    "code": "1A21",
+    "title": "Giardiasis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "lambliasis"
+    ]
+  },
+  {
+    "code": "1A40",
+    "title": "Viral gastroenteritis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "rotavirus enteritis",
+      "norovirus infection"
+    ]
+  },
+  {
+    "code": "1B10",
+    "title": "Tuberculosis of the respiratory system",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "pulmonary TB",
+      "pulmonary tuberculosis"
+    ]
+  },
+  {
+    "code": "1B11",
+    "title": "Tuberculosis of the nervous system",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "TB meningitis",
+      "tuberculous meningitis"
+    ]
+  },
+  {
+    "code": "1B12",
+    "title": "Tuberculosis of other organs",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "extrapulmonary tuberculosis"
+    ]
+  },
+  {
+    "code": "1B13",
+    "title": "Miliary tuberculosis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "disseminated tuberculosis"
+    ]
+  },
+  {
+    "code": "1B20",
+    "title": "Leprosy",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "Hansen disease"
+    ]
+  },
+  {
+    "code": "1B70",
+    "title": "Bacterial skin infection",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "cellulitis",
+      "erysipelas"
+    ]
+  },
+  {
+    "code": "1B72",
+    "title": "Cutaneous abscess",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "skin abscess",
+      "furuncle",
+      "boil"
+    ]
+  },
+  {
+    "code": "1B91",
+    "title": "Tetanus",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": []
+  },
+  {
+    "code": "1C12",
+    "title": "Whooping cough",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "pertussis"
+    ]
+  },
+  {
+    "code": "1C1A",
+    "title": "Diphtheria",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": []
+  },
+  {
+    "code": "1C60",
+    "title": "Meningococcal disease",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "meningococcaemia",
+      "neisseria meningitidis infection"
+    ]
+  },
+  {
+    "code": "1C62",
+    "title": "Bacterial meningitis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "pyogenic meningitis"
+    ]
+  },
+  {
+    "code": "1C80",
+    "title": "Brucellosis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "undulant fever"
+    ]
+  },
+  {
+    "code": "1C82",
+    "title": "Leptospirosis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "Weil disease"
+    ]
+  },
+  {
+    "code": "1D00",
+    "title": "Viral meningitis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "aseptic meningitis"
+    ]
+  },
+  {
+    "code": "1D01",
+    "title": "Viral encephalitis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": []
+  },
+  {
+    "code": "1D40",
+    "title": "Measles",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "rubeola",
+      "morbilli"
+    ]
+  },
+  {
+    "code": "1D41",
+    "title": "Rubella",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "German measles"
+    ]
+  },
+  {
+    "code": "1D44",
+    "title": "Mumps",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "epidemic parotitis"
+    ]
+  },
+  {
+    "code": "1D80",
+    "title": "Herpes simplex infection",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "HSV infection",
+      "cold sore"
+    ]
+  },
+  {
+    "code": "1D82",
+    "title": "Infectious mononucleosis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "glandular fever",
+      "EBV infection"
+    ]
+  },
+  {
+    "code": "1E30",
+    "title": "Viral hepatitis A",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "hepatitis A"
+    ]
+  },
+  {
+    "code": "1E31",
+    "title": "Viral hepatitis B",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "hepatitis B"
+    ]
+  },
+  {
+    "code": "1E32",
+    "title": "Viral hepatitis C",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "hepatitis C"
+    ]
+  },
+  {
+    "code": "1E50",
+    "title": "Human immunodeficiency virus disease",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "HIV disease",
+      "HIV infection"
+    ]
+  },
+  {
+    "code": "1F00",
+    "title": "Dengue fever",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "breakbone fever"
+    ]
+  },
+  {
+    "code": "1F01",
+    "title": "Severe dengue",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "dengue haemorrhagic fever"
+    ]
+  },
+  {
+    "code": "1F04",
+    "title": "Chikungunya",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": []
+  },
+  {
+    "code": "1F2Z",
+    "title": "Plasmodium falciparum malaria",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "falciparum malaria"
+    ]
+  },
+  {
+    "code": "1F40",
+    "title": "Malaria without parasitological confirmation",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "clinical malaria"
+    ]
+  },
+  {
+    "code": "1F45",
+    "title": "Severe malaria",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "complicated malaria",
+      "cerebral malaria"
+    ]
+  },
+  {
+    "code": "1F55",
+    "title": "Schistosomiasis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "bilharzia"
+    ]
+  },
+  {
+    "code": "1F60",
+    "title": "Soil-transmitted helminthiasis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "hookworm",
+      "ascariasis"
+    ]
+  },
+  {
+    "code": "1G40",
+    "title": "Sepsis without septic shock",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "sepsis"
+    ]
+  },
+  {
+    "code": "1G41",
+    "title": "Septic shock",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": []
+  },
+  {
+    "code": "1G60",
+    "title": "Candidiasis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "thrush",
+      "candidosis"
+    ]
+  },
+  {
+    "code": "1G61",
+    "title": "Cryptococcosis",
+    "chapter": "01 Certain infectious or parasitic diseases",
+    "synonyms": [
+      "cryptococcal disease"
+    ]
+  },
+  {
+    "code": "3A00",
+    "title": "Iron deficiency anaemia",
+    "chapter": "03 Diseases of the blood or blood-forming organs",
+    "synonyms": [
+      "sideropenic anaemia"
+    ]
+  },
+  {
+    "code": "3A01",
+    "title": "Vitamin B12 deficiency anaemia",
+    "chapter": "03 Diseases of the blood or blood-forming organs",
+    "synonyms": [
+      "pernicious anaemia"
+    ]
+  },
+  {
+    "code": "3A02",
+    "title": "Folate deficiency anaemia",
+    "chapter": "03 Diseases of the blood or blood-forming organs",
+    "synonyms": []
+  },
+  {
+    "code": "3A10",
+    "title": "Sickle cell disease",
+    "chapter": "03 Diseases of the blood or blood-forming organs",
+    "synonyms": [
+      "sickle cell anaemia",
+      "HbSS"
+    ]
+  },
+  {
+    "code": "3A11",
+    "title": "Sickle cell crisis",
+    "chapter": "03 Diseases of the blood or blood-forming organs",
+    "synonyms": [
+      "vaso-occlusive crisis",
+      "painful crisis"
+    ]
+  },
+  {
+    "code": "3A20",
+    "title": "Thalassaemia",
+    "chapter": "03 Diseases of the blood or blood-forming organs",
+    "synonyms": []
+  },
+  {
+    "code": "3A50",
+    "title": "Acquired haemolytic anaemia",
+    "chapter": "03 Diseases of the blood or blood-forming organs",
+    "synonyms": []
+  },
+  {
+    "code": "3B10",
+    "title": "Immune thrombocytopenic purpura",
+    "chapter": "03 Diseases of the blood or blood-forming organs",
+    "synonyms": [
+      "ITP"
+    ]
+  },
+  {
+    "code": "3B61",
+    "title": "Neutropenia",
+    "chapter": "03 Diseases of the blood or blood-forming organs",
+    "synonyms": [
+      "agranulocytosis"
+    ]
+  },
+  {
+    "code": "4A00",
+    "title": "Primary immunodeficiency",
+    "chapter": "04 Diseases of the immune system",
+    "synonyms": []
+  },
+  {
+    "code": "4A44",
+    "title": "Systemic lupus erythematosus",
+    "chapter": "04 Diseases of the immune system",
+    "synonyms": [
+      "SLE",
+      "lupus"
+    ]
+  },
+  {
+    "code": "4A60",
+    "title": "Anaphylaxis",
+    "chapter": "04 Diseases of the immune system",
+    "synonyms": [
+      "anaphylactic reaction",
+      "anaphylactic shock"
+    ]
+  },
+  {
+    "code": "4A80",
+    "title": "Allergic rhinitis",
+    "chapter": "04 Diseases of the immune system",
+    "synonyms": [
+      "hay fever",
+      "seasonal rhinitis"
+    ]
+  },
+  {
+    "code": "4A84",
+    "title": "Urticaria",
+    "chapter": "04 Diseases of the immune system",
+    "synonyms": [
+      "hives",
+      "nettle rash"
+    ]
+  },
+  {
+    "code": "4A85",
+    "title": "Angio-oedema",
+    "chapter": "04 Diseases of the immune system",
+    "synonyms": [
+      "angioedema",
+      "Quincke oedema"
+    ]
+  },
+  {
+    "code": "5A00",
+    "title": "Congenital hypothyroidism",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": []
+  },
+  {
+    "code": "5A01",
+    "title": "Acquired hypothyroidism",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "myxoedema",
+      "underactive thyroid"
+    ]
+  },
+  {
+    "code": "5A02",
+    "title": "Thyrotoxicosis",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "hyperthyroidism",
+      "Graves disease"
+    ]
+  },
+  {
+    "code": "5A03",
+    "title": "Thyroid storm",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "thyrotoxic crisis"
+    ]
+  },
+  {
+    "code": "5A05",
+    "title": "Goitre",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "thyroid enlargement"
+    ]
+  },
+  {
+    "code": "5A10",
+    "title": "Type 1 diabetes mellitus",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "insulin-dependent diabetes",
+      "T1DM"
+    ]
+  },
+  {
+    "code": "5A11",
+    "title": "Type 2 diabetes mellitus",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "T2DM",
+      "non-insulin-dependent diabetes"
+    ]
+  },
+  {
+    "code": "5A22",
+    "title": "Diabetic ketoacidosis",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "DKA"
+    ]
+  },
+  {
+    "code": "5A23",
+    "title": "Hyperosmolar hyperglycaemic state",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "HHS",
+      "hyperosmolar non-ketotic coma"
+    ]
+  },
+  {
+    "code": "5A24",
+    "title": "Hypoglycaemia",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "low blood sugar"
+    ]
+  },
+  {
+    "code": "5A40",
+    "title": "Diabetic retinopathy",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": []
+  },
+  {
+    "code": "5A41",
+    "title": "Diabetic nephropathy",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "diabetic kidney disease"
+    ]
+  },
+  {
+    "code": "5A42",
+    "title": "Diabetic neuropathy",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "diabetic polyneuropathy"
+    ]
+  },
+  {
+    "code": "5A43",
+    "title": "Diabetic foot ulcer",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "diabetic foot"
+    ]
+  },
+  {
+    "code": "5A70",
+    "title": "Adrenal insufficiency",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "Addison disease",
+      "adrenocortical insufficiency"
+    ]
+  },
+  {
+    "code": "5A71",
+    "title": "Cushing syndrome",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "hypercortisolism"
+    ]
+  },
+  {
+    "code": "5B50",
+    "title": "Undernutrition",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "malnutrition",
+      "underweight"
+    ]
+  },
+  {
+    "code": "5B51",
+    "title": "Severe acute malnutrition",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "kwashiorkor",
+      "marasmus",
+      "SAM"
+    ]
+  },
+  {
+    "code": "5B56",
+    "title": "Vitamin A deficiency",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": []
+  },
+  {
+    "code": "5B57",
+    "title": "Vitamin D deficiency",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "rickets",
+      "osteomalacia"
+    ]
+  },
+  {
+    "code": "5B5K",
+    "title": "Iodine deficiency",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": []
+  },
+  {
+    "code": "5B81",
+    "title": "Obesity",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": []
+  },
+  {
+    "code": "5C50",
+    "title": "Hyperlipidaemia",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "dyslipidaemia",
+      "hypercholesterolaemia"
+    ]
+  },
+  {
+    "code": "5C72",
+    "title": "Hyperkalaemia",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "elevated potassium"
+    ]
+  },
+  {
+    "code": "5C73",
+    "title": "Hypokalaemia",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "low potassium"
+    ]
+  },
+  {
+    "code": "5C75",
+    "title": "Hyponatraemia",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "low sodium"
+    ]
+  },
+  {
+    "code": "5C77",
+    "title": "Dehydration",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": [
+      "volume depletion"
+    ]
+  },
+  {
+    "code": "5C80",
+    "title": "Metabolic acidosis",
+    "chapter": "05 Endocrine, nutritional or metabolic diseases",
+    "synonyms": []
+  },
+  {
+    "code": "6A20",
+    "title": "Schizophrenia",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": []
+  },
+  {
+    "code": "6A60",
+    "title": "Bipolar type I disorder",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "manic depression"
+    ]
+  },
+  {
+    "code": "6A70",
+    "title": "Single episode depressive disorder",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "major depression, single episode"
+    ]
+  },
+  {
+    "code": "6A71",
+    "title": "Recurrent depressive disorder",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "recurrent major depression"
+    ]
+  },
+  {
+    "code": "6A72",
+    "title": "Dysthymic disorder",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "persistent depressive disorder"
+    ]
+  },
+  {
+    "code": "6B00",
+    "title": "Generalised anxiety disorder",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "GAD"
+    ]
+  },
+  {
+    "code": "6B01",
+    "title": "Panic disorder",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": []
+  },
+  {
+    "code": "6B02",
+    "title": "Agoraphobia",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": []
+  },
+  {
+    "code": "6B04",
+    "title": "Social anxiety disorder",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "social phobia"
+    ]
+  },
+  {
+    "code": "6B20",
+    "title": "Obsessive-compulsive disorder",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "OCD"
+    ]
+  },
+  {
+    "code": "6B40",
+    "title": "Post-traumatic stress disorder",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "PTSD"
+    ]
+  },
+  {
+    "code": "6B43",
+    "title": "Adjustment disorder",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": []
+  },
+  {
+    "code": "6B60",
+    "title": "Dissociative disorder",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": []
+  },
+  {
+    "code": "6B80",
+    "title": "Anorexia nervosa",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": []
+  },
+  {
+    "code": "6B81",
+    "title": "Bulimia nervosa",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": []
+  },
+  {
+    "code": "6C40",
+    "title": "Disorders due to use of alcohol",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "alcohol use disorder",
+      "alcohol dependence"
+    ]
+  },
+  {
+    "code": "6C43",
+    "title": "Disorders due to use of opioids",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "opioid use disorder"
+    ]
+  },
+  {
+    "code": "6C4G",
+    "title": "Disorders due to use of khat",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "khat use disorder",
+      "miraa use"
+    ]
+  },
+  {
+    "code": "6D70",
+    "title": "Delirium",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "acute confusional state"
+    ]
+  },
+  {
+    "code": "6D80",
+    "title": "Dementia due to Alzheimer disease",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "Alzheimer dementia"
+    ]
+  },
+  {
+    "code": "6D81",
+    "title": "Vascular dementia",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "multi-infarct dementia"
+    ]
+  },
+  {
+    "code": "6A05",
+    "title": "Attention deficit hyperactivity disorder",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "ADHD"
+    ]
+  },
+  {
+    "code": "6A02",
+    "title": "Autism spectrum disorder",
+    "chapter": "06 Mental, behavioural or neurodevelopmental disorders",
+    "synonyms": [
+      "ASD"
+    ]
+  },
+  {
+    "code": "7A00",
+    "title": "Insomnia disorder",
+    "chapter": "07 Sleep-wake disorders",
+    "synonyms": [
+      "chronic insomnia"
+    ]
+  },
+  {
+    "code": "7A41",
+    "title": "Obstructive sleep apnoea",
+    "chapter": "07 Sleep-wake disorders",
+    "synonyms": [
+      "OSA",
+      "sleep apnoea"
+    ]
+  },
+  {
+    "code": "8A00",
+    "title": "Generalised tonic-clonic seizure",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "grand mal seizure"
+    ]
+  },
+  {
+    "code": "8A01",
+    "title": "Focal seizure",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "partial seizure"
+    ]
+  },
+  {
+    "code": "8A60",
+    "title": "Epilepsy",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "seizure disorder"
+    ]
+  },
+  {
+    "code": "8A66",
+    "title": "Status epilepticus",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": []
+  },
+  {
+    "code": "8A68",
+    "title": "Febrile seizure",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "febrile convulsion"
+    ]
+  },
+  {
+    "code": "8A80",
+    "title": "Migraine",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "migraine headache"
+    ]
+  },
+  {
+    "code": "8A81",
+    "title": "Tension-type headache",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "tension headache"
+    ]
+  },
+  {
+    "code": "8A82",
+    "title": "Trigeminal autonomic cephalalgia",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "cluster headache"
+    ]
+  },
+  {
+    "code": "8A84",
+    "title": "Medication-overuse headache",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "analgesic rebound headache"
+    ]
+  },
+  {
+    "code": "8A8Z",
+    "title": "Headache, unspecified",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "headache NOS"
+    ]
+  },
+  {
+    "code": "8B00",
+    "title": "Cerebral ischaemic stroke",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "ischaemic stroke",
+      "cerebral infarction"
+    ]
+  },
+  {
+    "code": "8B01",
+    "title": "Intracerebral haemorrhage",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "haemorrhagic stroke"
+    ]
+  },
+  {
+    "code": "8B02",
+    "title": "Subarachnoid haemorrhage",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "SAH"
+    ]
+  },
+  {
+    "code": "8B20",
+    "title": "Transient ischaemic attack",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "TIA",
+      "mini stroke"
+    ]
+  },
+  {
+    "code": "8B60",
+    "title": "Idiopathic intracranial hypertension",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "pseudotumour cerebri",
+      "IIH"
+    ]
+  },
+  {
+    "code": "8B82",
+    "title": "Bell palsy",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "idiopathic facial nerve palsy"
+    ]
+  },
+  {
+    "code": "8B84",
+    "title": "Trigeminal neuralgia",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "tic douloureux"
+    ]
+  },
+  {
+    "code": "8C00",
+    "title": "Guillain-Barre syndrome",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "acute inflammatory demyelinating polyneuropathy"
+    ]
+  },
+  {
+    "code": "8C10",
+    "title": "Carpal tunnel syndrome",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "median nerve entrapment"
+    ]
+  },
+  {
+    "code": "8A40",
+    "title": "Multiple sclerosis",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "MS"
+    ]
+  },
+  {
+    "code": "8A20",
+    "title": "Parkinson disease",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "paralysis agitans"
+    ]
+  },
+  {
+    "code": "8D40",
+    "title": "Peripheral neuropathy",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "polyneuropathy"
+    ]
+  },
+  {
+    "code": "8E4A",
+    "title": "Vertigo, peripheral",
+    "chapter": "08 Diseases of the nervous system",
+    "synonyms": [
+      "benign paroxysmal positional vertigo",
+      "BPPV"
+    ]
+  },
+  {
+    "code": "9A00",
+    "title": "Refractive error",
+    "chapter": "09 Diseases of the visual system",
+    "synonyms": [
+      "myopia",
+      "hypermetropia",
+      "astigmatism"
+    ]
+  },
+  {
+    "code": "9A60",
+    "title": "Cataract",
+    "chapter": "09 Diseases of the visual system",
+    "synonyms": []
+  },
+  {
+    "code": "9A61",
+    "title": "Glaucoma",
+    "chapter": "09 Diseases of the visual system",
+    "synonyms": []
+  },
+  {
+    "code": "9A62",
+    "title": "Acute angle-closure glaucoma",
+    "chapter": "09 Diseases of the visual system",
+    "synonyms": [
+      "acute glaucoma"
+    ]
+  },
+  {
+    "code": "9A78",
+    "title": "Conjunctivitis",
+    "chapter": "09 Diseases of the visual system",
+    "synonyms": [
+      "pink eye"
+    ]
+  },
+  {
+    "code": "9A79",
+    "title": "Keratitis",
+    "chapter": "09 Diseases of the visual system",
+    "synonyms": [
+      "corneal ulcer"
+    ]
+  },
+  {
+    "code": "9B10",
+    "title": "Uveitis",
+    "chapter": "09 Diseases of the visual system",
+    "synonyms": [
+      "iritis"
+    ]
+  },
+  {
+    "code": "9B71",
+    "title": "Retinal detachment",
+    "chapter": "09 Diseases of the visual system",
+    "synonyms": []
+  },
+  {
+    "code": "9C40",
+    "title": "Optic neuritis",
+    "chapter": "09 Diseases of the visual system",
+    "synonyms": []
+  },
+  {
+    "code": "9C61",
+    "title": "Trachoma",
+    "chapter": "09 Diseases of the visual system",
+    "synonyms": []
+  },
+  {
+    "code": "AA00",
+    "title": "Otitis externa",
+    "chapter": "10 Diseases of the ear or mastoid process",
+    "synonyms": [
+      "swimmer's ear"
+    ]
+  },
+  {
+    "code": "AA30",
+    "title": "Acute otitis media",
+    "chapter": "10 Diseases of the ear or mastoid process",
+    "synonyms": [
+      "middle ear infection",
+      "AOM"
+    ]
+  },
+  {
+    "code": "AA31",
+    "title": "Chronic suppurative otitis media",
+    "chapter": "10 Diseases of the ear or mastoid process",
+    "synonyms": [
+      "CSOM"
+    ]
+  },
+  {
+    "code": "AA32",
+    "title": "Otitis media with effusion",
+    "chapter": "10 Diseases of the ear or mastoid process",
+    "synonyms": [
+      "glue ear",
+      "serous otitis media"
+    ]
+  },
+  {
+    "code": "AA40",
+    "title": "Mastoiditis",
+    "chapter": "10 Diseases of the ear or mastoid process",
+    "synonyms": []
+  },
+  {
+    "code": "AB30",
+    "title": "Sensorineural hearing loss",
+    "chapter": "10 Diseases of the ear or mastoid process",
+    "synonyms": []
+  },
+  {
+    "code": "AB31",
+    "title": "Conductive hearing loss",
+    "chapter": "10 Diseases of the ear or mastoid process",
+    "synonyms": []
+  },
+  {
+    "code": "AB70",
+    "title": "Tonsillitis",
+    "chapter": "10 Diseases of the ear or mastoid process",
+    "synonyms": [
+      "acute tonsillitis",
+      "tonsillopharyngitis"
+    ]
+  },
+  {
+    "code": "AB71",
+    "title": "Pharyngitis",
+    "chapter": "10 Diseases of the ear or mastoid process",
+    "synonyms": [
+      "sore throat",
+      "acute pharyngitis"
+    ]
+  },
+  {
+    "code": "AB72",
+    "title": "Peritonsillar abscess",
+    "chapter": "10 Diseases of the ear or mastoid process",
+    "synonyms": [
+      "quinsy"
+    ]
+  },
+  {
+    "code": "AB75",
+    "title": "Epiglottitis",
+    "chapter": "10 Diseases of the ear or mastoid process",
+    "synonyms": [
+      "supraglottitis"
+    ]
+  },
+  {
+    "code": "AC00",
+    "title": "Meniere disease",
+    "chapter": "10 Diseases of the ear or mastoid process",
+    "synonyms": []
+  },
+  {
+    "code": "BA00",
+    "title": "Essential hypertension",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "primary hypertension",
+      "high blood pressure"
+    ]
+  },
+  {
+    "code": "BA01",
+    "title": "Secondary hypertension",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": []
+  },
+  {
+    "code": "BA04",
+    "title": "Hypertensive emergency",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "malignant hypertension",
+      "hypertensive crisis"
+    ]
+  },
+  {
+    "code": "BA40",
+    "title": "Angina pectoris",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "stable angina",
+      "exertional chest pain"
+    ]
+  },
+  {
+    "code": "BA41",
+    "title": "Acute myocardial infarction",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "MI",
+      "heart attack",
+      "STEMI",
+      "NSTEMI"
+    ]
+  },
+  {
+    "code": "BA43",
+    "title": "Unstable angina",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "acute coronary syndrome without infarction"
+    ]
+  },
+  {
+    "code": "BA50",
+    "title": "Chronic ischaemic heart disease",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "coronary artery disease",
+      "CAD"
+    ]
+  },
+  {
+    "code": "BA60",
+    "title": "Acute pericarditis",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "pericarditis"
+    ]
+  },
+  {
+    "code": "BA61",
+    "title": "Pericardial effusion",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": []
+  },
+  {
+    "code": "BA62",
+    "title": "Cardiac tamponade",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": []
+  },
+  {
+    "code": "BB00",
+    "title": "Rheumatic fever",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "acute rheumatic fever"
+    ]
+  },
+  {
+    "code": "BB01",
+    "title": "Rheumatic heart disease",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "chronic rheumatic valve disease"
+    ]
+  },
+  {
+    "code": "BB40",
+    "title": "Infective endocarditis",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "bacterial endocarditis"
+    ]
+  },
+  {
+    "code": "BB60",
+    "title": "Mitral stenosis",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": []
+  },
+  {
+    "code": "BB61",
+    "title": "Mitral regurgitation",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "mitral incompetence"
+    ]
+  },
+  {
+    "code": "BB65",
+    "title": "Aortic stenosis",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": []
+  },
+  {
+    "code": "BC43",
+    "title": "Atrial fibrillation",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "AF",
+      "atrial flutter"
+    ]
+  },
+  {
+    "code": "BC63",
+    "title": "Supraventricular tachycardia",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "SVT"
+    ]
+  },
+  {
+    "code": "BC65",
+    "title": "Ventricular tachycardia",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "VT"
+    ]
+  },
+  {
+    "code": "BC81",
+    "title": "Cardiomyopathy",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "dilated cardiomyopathy"
+    ]
+  },
+  {
+    "code": "BD10",
+    "title": "Heart failure",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "congestive cardiac failure",
+      "CCF",
+      "CHF"
+    ]
+  },
+  {
+    "code": "BD11",
+    "title": "Acute decompensated heart failure",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "acute pulmonary oedema"
+    ]
+  },
+  {
+    "code": "BD40",
+    "title": "Peripheral arterial disease",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "intermittent claudication"
+    ]
+  },
+  {
+    "code": "BD50",
+    "title": "Aortic aneurysm",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "abdominal aortic aneurysm",
+      "AAA"
+    ]
+  },
+  {
+    "code": "BD51",
+    "title": "Aortic dissection",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "dissecting aneurysm"
+    ]
+  },
+  {
+    "code": "BD70",
+    "title": "Deep vein thrombosis",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "DVT",
+      "venous thrombosis"
+    ]
+  },
+  {
+    "code": "BD71",
+    "title": "Pulmonary embolism",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "PE",
+      "pulmonary thromboembolism"
+    ]
+  },
+  {
+    "code": "BD74",
+    "title": "Varicose veins of lower extremity",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "varicosities"
+    ]
+  },
+  {
+    "code": "BD90",
+    "title": "Venous leg ulcer",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "stasis ulcer"
+    ]
+  },
+  {
+    "code": "BE20",
+    "title": "Shock, unspecified",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "circulatory collapse"
+    ]
+  },
+  {
+    "code": "BE21",
+    "title": "Hypovolaemic shock",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": [
+      "haemorrhagic shock"
+    ]
+  },
+  {
+    "code": "BE22",
+    "title": "Cardiogenic shock",
+    "chapter": "11 Diseases of the circulatory system",
+    "synonyms": []
+  },
+  {
+    "code": "CA00",
+    "title": "Acute nasopharyngitis",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "common cold",
+      "coryza"
+    ]
+  },
+  {
+    "code": "CA01",
+    "title": "Acute sinusitis",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "sinusitis",
+      "rhinosinusitis"
+    ]
+  },
+  {
+    "code": "CA05",
+    "title": "Acute laryngitis",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": []
+  },
+  {
+    "code": "CA07",
+    "title": "Croup",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "acute laryngotracheobronchitis"
+    ]
+  },
+  {
+    "code": "CA20",
+    "title": "Acute bronchitis",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "chest infection"
+    ]
+  },
+  {
+    "code": "CA21",
+    "title": "Acute bronchiolitis",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "bronchiolitis",
+      "RSV bronchiolitis"
+    ]
+  },
+  {
+    "code": "CA22",
+    "title": "Pneumonia, organism unspecified",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "community-acquired pneumonia",
+      "CAP",
+      "chest consolidation"
+    ]
+  },
+  {
+    "code": "CA23",
+    "title": "Bacterial pneumonia",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "lobar pneumonia",
+      "pneumococcal pneumonia"
+    ]
+  },
+  {
+    "code": "CA24",
+    "title": "Viral pneumonia",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": []
+  },
+  {
+    "code": "CA25",
+    "title": "Aspiration pneumonia",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "aspiration pneumonitis"
+    ]
+  },
+  {
+    "code": "CA40",
+    "title": "Chronic obstructive pulmonary disease",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "COPD",
+      "chronic bronchitis",
+      "emphysema"
+    ]
+  },
+  {
+    "code": "CA41",
+    "title": "COPD with acute exacerbation",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "infective exacerbation of COPD",
+      "AECOPD"
+    ]
+  },
+  {
+    "code": "CA23.1",
+    "title": "Lung abscess",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "pulmonary abscess"
+    ]
+  },
+  {
+    "code": "CA60",
+    "title": "Bronchial asthma",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "asthma"
+    ]
+  },
+  {
+    "code": "CA61",
+    "title": "Acute asthma exacerbation",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "acute severe asthma",
+      "asthma attack"
+    ]
+  },
+  {
+    "code": "CA70",
+    "title": "Bronchiectasis",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": []
+  },
+  {
+    "code": "CA80",
+    "title": "Pneumoconiosis",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "silicosis",
+      "occupational lung disease"
+    ]
+  },
+  {
+    "code": "CA81",
+    "title": "Hypersensitivity pneumonitis",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "extrinsic allergic alveolitis"
+    ]
+  },
+  {
+    "code": "CB00",
+    "title": "Pleural effusion",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": []
+  },
+  {
+    "code": "CB01",
+    "title": "Empyema",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "pyothorax"
+    ]
+  },
+  {
+    "code": "CB03",
+    "title": "Pneumothorax",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "collapsed lung"
+    ]
+  },
+  {
+    "code": "CB04",
+    "title": "Tension pneumothorax",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": []
+  },
+  {
+    "code": "CB40",
+    "title": "Acute respiratory distress syndrome",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "ARDS"
+    ]
+  },
+  {
+    "code": "CB41",
+    "title": "Respiratory failure",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": [
+      "type 1 respiratory failure",
+      "type 2 respiratory failure"
+    ]
+  },
+  {
+    "code": "CB60",
+    "title": "Pulmonary hypertension",
+    "chapter": "12 Diseases of the respiratory system",
+    "synonyms": []
+  },
+  {
+    "code": "DA01",
+    "title": "Dental caries",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "tooth decay"
+    ]
+  },
+  {
+    "code": "DA02",
+    "title": "Periapical abscess",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "dental abscess"
+    ]
+  },
+  {
+    "code": "DA20",
+    "title": "Stomatitis",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "mouth ulcer",
+      "aphthous ulcer"
+    ]
+  },
+  {
+    "code": "DA22",
+    "title": "Oral candidiasis",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "oral thrush"
+    ]
+  },
+  {
+    "code": "DA40",
+    "title": "Gastro-oesophageal reflux disease",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "GORD",
+      "GERD",
+      "reflux",
+      "heartburn"
+    ]
+  },
+  {
+    "code": "DA42",
+    "title": "Oesophagitis",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": []
+  },
+  {
+    "code": "DA43",
+    "title": "Oesophageal varices",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": []
+  },
+  {
+    "code": "DA60",
+    "title": "Gastric ulcer",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "stomach ulcer"
+    ]
+  },
+  {
+    "code": "DA61",
+    "title": "Duodenal ulcer",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": []
+  },
+  {
+    "code": "DA62",
+    "title": "Peptic ulcer disease",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "PUD"
+    ]
+  },
+  {
+    "code": "DA63",
+    "title": "Gastritis",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "acute gastritis"
+    ]
+  },
+  {
+    "code": "DA80",
+    "title": "Upper gastrointestinal haemorrhage",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "haematemesis",
+      "upper GI bleed"
+    ]
+  },
+  {
+    "code": "DB10",
+    "title": "Crohn disease",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "regional enteritis"
+    ]
+  },
+  {
+    "code": "DB11",
+    "title": "Ulcerative colitis",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": []
+  },
+  {
+    "code": "DB30",
+    "title": "Coeliac disease",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "gluten enteropathy"
+    ]
+  },
+  {
+    "code": "DB32",
+    "title": "Irritable bowel syndrome",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "IBS",
+      "spastic colon"
+    ]
+  },
+  {
+    "code": "DB50",
+    "title": "Intestinal obstruction",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "bowel obstruction",
+      "ileus"
+    ]
+  },
+  {
+    "code": "DB51",
+    "title": "Intussusception",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": []
+  },
+  {
+    "code": "DB52",
+    "title": "Volvulus",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "sigmoid volvulus"
+    ]
+  },
+  {
+    "code": "DB60",
+    "title": "Diverticular disease",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "diverticulosis"
+    ]
+  },
+  {
+    "code": "DB61",
+    "title": "Acute diverticulitis",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "diverticulitis"
+    ]
+  },
+  {
+    "code": "DB70",
+    "title": "Inguinal hernia",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": []
+  },
+  {
+    "code": "DB71",
+    "title": "Strangulated hernia",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "incarcerated hernia"
+    ]
+  },
+  {
+    "code": "DB90",
+    "title": "Acute appendicitis",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "appendicitis"
+    ]
+  },
+  {
+    "code": "DB91",
+    "title": "Appendiceal abscess",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "appendix mass"
+    ]
+  },
+  {
+    "code": "DB93",
+    "title": "Peritonitis",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "generalised peritonitis"
+    ]
+  },
+  {
+    "code": "DC10",
+    "title": "Haemorrhoids",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "piles"
+    ]
+  },
+  {
+    "code": "DC11",
+    "title": "Anal fissure",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": []
+  },
+  {
+    "code": "DC12",
+    "title": "Perianal abscess",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": []
+  },
+  {
+    "code": "DB94",
+    "title": "Lower gastrointestinal haemorrhage",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "rectal bleeding",
+      "haematochezia"
+    ]
+  },
+  {
+    "code": "DC30",
+    "title": "Alcoholic liver disease",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "alcoholic hepatitis"
+    ]
+  },
+  {
+    "code": "DC31",
+    "title": "Cirrhosis of liver",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "hepatic cirrhosis"
+    ]
+  },
+  {
+    "code": "DC33",
+    "title": "Hepatic failure",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "liver failure"
+    ]
+  },
+  {
+    "code": "DC50",
+    "title": "Cholelithiasis",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "gallstones"
+    ]
+  },
+  {
+    "code": "DC51",
+    "title": "Acute cholecystitis",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "cholecystitis"
+    ]
+  },
+  {
+    "code": "DC52",
+    "title": "Cholangitis",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "ascending cholangitis"
+    ]
+  },
+  {
+    "code": "DC70",
+    "title": "Acute pancreatitis",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": [
+      "pancreatitis"
+    ]
+  },
+  {
+    "code": "DC71",
+    "title": "Chronic pancreatitis",
+    "chapter": "13 Diseases of the digestive system",
+    "synonyms": []
+  },
+  {
+    "code": "EA80",
+    "title": "Atopic eczema",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "atopic dermatitis",
+      "eczema"
+    ]
+  },
+  {
+    "code": "EA81",
+    "title": "Contact dermatitis",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "allergic contact dermatitis"
+    ]
+  },
+  {
+    "code": "EA82",
+    "title": "Seborrhoeic dermatitis",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "dandruff"
+    ]
+  },
+  {
+    "code": "EA90",
+    "title": "Psoriasis",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "plaque psoriasis"
+    ]
+  },
+  {
+    "code": "EB00",
+    "title": "Pityriasis rosea",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": []
+  },
+  {
+    "code": "EB20",
+    "title": "Lichen planus",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": []
+  },
+  {
+    "code": "EC20",
+    "title": "Acne",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "acne vulgaris"
+    ]
+  },
+  {
+    "code": "ED60",
+    "title": "Vitiligo",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": []
+  },
+  {
+    "code": "EE60",
+    "title": "Alopecia areata",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "patchy hair loss"
+    ]
+  },
+  {
+    "code": "EE90",
+    "title": "Impetigo",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "school sores"
+    ]
+  },
+  {
+    "code": "EF00",
+    "title": "Dermatophytosis",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "tinea",
+      "ringworm",
+      "athlete's foot"
+    ]
+  },
+  {
+    "code": "EF01",
+    "title": "Tinea capitis",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "scalp ringworm"
+    ]
+  },
+  {
+    "code": "EG00",
+    "title": "Scabies",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": []
+  },
+  {
+    "code": "EG10",
+    "title": "Pediculosis",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "head lice"
+    ]
+  },
+  {
+    "code": "EH60",
+    "title": "Pressure ulcer",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "bedsore",
+      "decubitus ulcer"
+    ]
+  },
+  {
+    "code": "EK00",
+    "title": "Stevens-Johnson syndrome",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "SJS"
+    ]
+  },
+  {
+    "code": "EK02",
+    "title": "Drug eruption",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "drug rash",
+      "cutaneous adverse drug reaction"
+    ]
+  },
+  {
+    "code": "EK50",
+    "title": "Erythema multiforme",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": []
+  },
+  {
+    "code": "EJ30",
+    "title": "Burn of skin",
+    "chapter": "14 Diseases of the skin",
+    "synonyms": [
+      "thermal burn",
+      "scald"
+    ]
+  },
+  {
+    "code": "FA00",
+    "title": "Osteoarthritis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "degenerative joint disease",
+      "OA"
+    ]
+  },
+  {
+    "code": "FA20",
+    "title": "Rheumatoid arthritis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "RA"
+    ]
+  },
+  {
+    "code": "FA24",
+    "title": "Juvenile idiopathic arthritis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "JIA"
+    ]
+  },
+  {
+    "code": "FA25",
+    "title": "Reactive arthritis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "Reiter syndrome"
+    ]
+  },
+  {
+    "code": "FA26",
+    "title": "Ankylosing spondylitis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "axial spondyloarthritis"
+    ]
+  },
+  {
+    "code": "FA30",
+    "title": "Septic arthritis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "pyogenic arthritis",
+      "infective arthritis"
+    ]
+  },
+  {
+    "code": "FA32",
+    "title": "Transient synovitis of hip",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "irritable hip"
+    ]
+  },
+  {
+    "code": "FB32",
+    "title": "Gout",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "gouty arthritis",
+      "podagra"
+    ]
+  },
+  {
+    "code": "FB33",
+    "title": "Calcium pyrophosphate deposition disease",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "pseudogout",
+      "chondrocalcinosis"
+    ]
+  },
+  {
+    "code": "FA36",
+    "title": "Osteomyelitis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "bone infection"
+    ]
+  },
+  {
+    "code": "FB40",
+    "title": "Low back pain",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "lumbago",
+      "mechanical back pain"
+    ]
+  },
+  {
+    "code": "FB41",
+    "title": "Lumbar disc herniation with radiculopathy",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "sciatica",
+      "slipped disc"
+    ]
+  },
+  {
+    "code": "FB42",
+    "title": "Cervical spondylosis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "neck spondylosis"
+    ]
+  },
+  {
+    "code": "FB43",
+    "title": "Cauda equina syndrome",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": []
+  },
+  {
+    "code": "FB50",
+    "title": "Rotator cuff syndrome",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "shoulder impingement"
+    ]
+  },
+  {
+    "code": "FB51",
+    "title": "Adhesive capsulitis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "frozen shoulder"
+    ]
+  },
+  {
+    "code": "FB52",
+    "title": "Lateral epicondylitis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "tennis elbow"
+    ]
+  },
+  {
+    "code": "FB55",
+    "title": "Plantar fasciitis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "heel pain"
+    ]
+  },
+  {
+    "code": "FB56",
+    "title": "Tenosynovitis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "de Quervain tenosynovitis"
+    ]
+  },
+  {
+    "code": "FB80",
+    "title": "Osteoporosis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": []
+  },
+  {
+    "code": "FB84",
+    "title": "Osteomalacia in adults",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": []
+  },
+  {
+    "code": "FC00",
+    "title": "Fibromyalgia",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "chronic widespread pain"
+    ]
+  },
+  {
+    "code": "FA31",
+    "title": "Costochondritis",
+    "chapter": "15 Diseases of the musculoskeletal system or connective tissue",
+    "synonyms": [
+      "Tietze syndrome",
+      "chest wall pain"
+    ]
+  },
+  {
+    "code": "GA00",
+    "title": "Acute cystitis",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "lower urinary tract infection",
+      "bladder infection"
+    ]
+  },
+  {
+    "code": "GB70",
+    "title": "Calculus of kidney or ureter",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "renal colic",
+      "nephrolithiasis",
+      "kidney stone",
+      "ureteric stone"
+    ]
+  },
+  {
+    "code": "GB71",
+    "title": "Calculus of bladder",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": []
+  },
+  {
+    "code": "GC00",
+    "title": "Urethritis",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": []
+  },
+  {
+    "code": "GC01",
+    "title": "Acute pyelonephritis",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "upper urinary tract infection",
+      "kidney infection"
+    ]
+  },
+  {
+    "code": "GC02",
+    "title": "Chronic pyelonephritis",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": []
+  },
+  {
+    "code": "GC08",
+    "title": "Urinary tract infection, site not specified",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "UTI"
+    ]
+  },
+  {
+    "code": "GB40",
+    "title": "Acute kidney injury",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "AKI",
+      "acute renal failure"
+    ]
+  },
+  {
+    "code": "GB41",
+    "title": "Chronic kidney disease",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "CKD",
+      "chronic renal failure"
+    ]
+  },
+  {
+    "code": "GB50",
+    "title": "Nephrotic syndrome",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": []
+  },
+  {
+    "code": "GB51",
+    "title": "Acute nephritic syndrome",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "glomerulonephritis"
+    ]
+  },
+  {
+    "code": "GA20",
+    "title": "Benign prostatic hyperplasia",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "BPH",
+      "prostatic enlargement"
+    ]
+  },
+  {
+    "code": "GA21",
+    "title": "Acute prostatitis",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "prostatitis"
+    ]
+  },
+  {
+    "code": "GA30",
+    "title": "Epididymo-orchitis",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "epididymitis",
+      "orchitis"
+    ]
+  },
+  {
+    "code": "GA31",
+    "title": "Testicular torsion",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "torsion of testis"
+    ]
+  },
+  {
+    "code": "GA40",
+    "title": "Erectile dysfunction",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": []
+  },
+  {
+    "code": "GA34",
+    "title": "Phimosis",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": []
+  },
+  {
+    "code": "GA10",
+    "title": "Pelvic inflammatory disease",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "PID",
+      "salpingitis"
+    ]
+  },
+  {
+    "code": "GA11",
+    "title": "Bacterial vaginosis",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "BV"
+    ]
+  },
+  {
+    "code": "GA12",
+    "title": "Vulvovaginal candidiasis",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "vaginal thrush"
+    ]
+  },
+  {
+    "code": "GA13",
+    "title": "Trichomoniasis",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": []
+  },
+  {
+    "code": "GA15",
+    "title": "Cervicitis",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": []
+  },
+  {
+    "code": "GA30.1",
+    "title": "Ovarian cyst",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "functional ovarian cyst"
+    ]
+  },
+  {
+    "code": "GA33",
+    "title": "Ovarian torsion",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "adnexal torsion"
+    ]
+  },
+  {
+    "code": "GA35",
+    "title": "Uterine leiomyoma",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "fibroid",
+      "myoma"
+    ]
+  },
+  {
+    "code": "GA36",
+    "title": "Endometriosis",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": []
+  },
+  {
+    "code": "GA22",
+    "title": "Abnormal uterine bleeding",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "menorrhagia",
+      "heavy menstrual bleeding"
+    ]
+  },
+  {
+    "code": "GA23",
+    "title": "Dysmenorrhoea",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "period pain"
+    ]
+  },
+  {
+    "code": "GA24",
+    "title": "Amenorrhoea",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": []
+  },
+  {
+    "code": "GB04",
+    "title": "Breast abscess",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "mastitis with abscess"
+    ]
+  },
+  {
+    "code": "GB20",
+    "title": "Mastitis",
+    "chapter": "16 Diseases of the genitourinary system",
+    "synonyms": [
+      "lactational mastitis"
+    ]
+  },
+  {
+    "code": "1A61",
+    "title": "Syphilis",
+    "chapter": "17 Conditions related to sexual health",
+    "synonyms": [
+      "treponemal infection"
+    ]
+  },
+  {
+    "code": "1A70",
+    "title": "Gonorrhoea",
+    "chapter": "17 Conditions related to sexual health",
+    "synonyms": [
+      "gonococcal infection"
+    ]
+  },
+  {
+    "code": "1A72",
+    "title": "Chlamydial infection",
+    "chapter": "17 Conditions related to sexual health",
+    "synonyms": [
+      "chlamydia trachomatis infection"
+    ]
+  },
+  {
+    "code": "JA00",
+    "title": "Pregnancy, uncomplicated",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "normal pregnancy",
+      "antenatal care"
+    ]
+  },
+  {
+    "code": "JA20",
+    "title": "Spontaneous abortion",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "miscarriage"
+    ]
+  },
+  {
+    "code": "JA21",
+    "title": "Threatened abortion",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "threatened miscarriage"
+    ]
+  },
+  {
+    "code": "JA22",
+    "title": "Missed abortion",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "missed miscarriage"
+    ]
+  },
+  {
+    "code": "JA24",
+    "title": "Septic abortion",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": []
+  },
+  {
+    "code": "JB00",
+    "title": "Ectopic pregnancy",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "tubal pregnancy",
+      "extrauterine pregnancy"
+    ]
+  },
+  {
+    "code": "JA40",
+    "title": "Hyperemesis gravidarum",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "severe vomiting in pregnancy"
+    ]
+  },
+  {
+    "code": "JA60",
+    "title": "Gestational hypertension",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "pregnancy-induced hypertension",
+      "PIH"
+    ]
+  },
+  {
+    "code": "JA63",
+    "title": "Pre-eclampsia",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "toxaemia of pregnancy"
+    ]
+  },
+  {
+    "code": "JA64",
+    "title": "Severe pre-eclampsia",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "HELLP syndrome"
+    ]
+  },
+  {
+    "code": "JA65",
+    "title": "Eclampsia",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "eclamptic seizure"
+    ]
+  },
+  {
+    "code": "JA80",
+    "title": "Gestational diabetes mellitus",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "GDM"
+    ]
+  },
+  {
+    "code": "JA86",
+    "title": "Anaemia complicating pregnancy",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": []
+  },
+  {
+    "code": "JA88",
+    "title": "Genitourinary infection in pregnancy",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "UTI in pregnancy",
+      "asymptomatic bacteriuria in pregnancy"
+    ]
+  },
+  {
+    "code": "JB40",
+    "title": "Placenta praevia",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": []
+  },
+  {
+    "code": "JB41",
+    "title": "Placental abruption",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "abruptio placentae"
+    ]
+  },
+  {
+    "code": "JB42",
+    "title": "Antepartum haemorrhage",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "APH"
+    ]
+  },
+  {
+    "code": "JB0A",
+    "title": "Preterm labour",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "premature labour"
+    ]
+  },
+  {
+    "code": "JB0B",
+    "title": "Prelabour rupture of membranes",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "PROM",
+      "PPROM"
+    ]
+  },
+  {
+    "code": "JB44",
+    "title": "Obstructed labour",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "cephalopelvic disproportion"
+    ]
+  },
+  {
+    "code": "JC50",
+    "title": "Postpartum haemorrhage",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "PPH"
+    ]
+  },
+  {
+    "code": "JB63",
+    "title": "Puerperal sepsis",
+    "chapter": "18 Pregnancy, childbirth or the puerperium",
+    "synonyms": [
+      "postpartum infection"
+    ]
+  },
+  {
+    "code": "KA20",
+    "title": "Preterm newborn",
+    "chapter": "19 Certain conditions originating in the perinatal period",
+    "synonyms": [
+      "prematurity"
+    ]
+  },
+  {
+    "code": "KA21",
+    "title": "Low birth weight newborn",
+    "chapter": "19 Certain conditions originating in the perinatal period",
+    "synonyms": [
+      "LBW"
+    ]
+  },
+  {
+    "code": "KA40",
+    "title": "Birth asphyxia",
+    "chapter": "19 Certain conditions originating in the perinatal period",
+    "synonyms": [
+      "perinatal asphyxia"
+    ]
+  },
+  {
+    "code": "KA60",
+    "title": "Neonatal jaundice",
+    "chapter": "19 Certain conditions originating in the perinatal period",
+    "synonyms": [
+      "hyperbilirubinaemia of newborn"
+    ]
+  },
+  {
+    "code": "KA61",
+    "title": "Neonatal sepsis",
+    "chapter": "19 Certain conditions originating in the perinatal period",
+    "synonyms": [
+      "sepsis of newborn"
+    ]
+  },
+  {
+    "code": "KB20",
+    "title": "Respiratory distress syndrome of newborn",
+    "chapter": "19 Certain conditions originating in the perinatal period",
+    "synonyms": [
+      "hyaline membrane disease"
+    ]
+  },
+  {
+    "code": "MA00",
+    "title": "Fever of unknown origin",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "pyrexia of unknown origin",
+      "PUO"
+    ]
+  },
+  {
+    "code": "MB20",
+    "title": "Syncope",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "fainting",
+      "collapse"
+    ]
+  },
+  {
+    "code": "MB23",
+    "title": "Dizziness",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "light-headedness"
+    ]
+  },
+  {
+    "code": "MB40",
+    "title": "Altered mental status",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "confusion",
+      "reduced consciousness"
+    ]
+  },
+  {
+    "code": "MD11",
+    "title": "Chest pain",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "chest discomfort"
+    ]
+  },
+  {
+    "code": "MD12",
+    "title": "Palpitations",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": []
+  },
+  {
+    "code": "MD30",
+    "title": "Haemoptysis",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "coughing blood",
+      "blood-stained sputum"
+    ]
+  },
+  {
+    "code": "MD11.2",
+    "title": "Dyspnoea",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "shortness of breath",
+      "breathlessness"
+    ]
+  },
+  {
+    "code": "MD90",
+    "title": "Cough",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "chronic cough"
+    ]
+  },
+  {
+    "code": "ME05",
+    "title": "Abdominal pain",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "stomach pain"
+    ]
+  },
+  {
+    "code": "ME08",
+    "title": "Nausea and vomiting",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": []
+  },
+  {
+    "code": "ME04",
+    "title": "Jaundice",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "icterus"
+    ]
+  },
+  {
+    "code": "ME24",
+    "title": "Haematuria",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "blood in urine"
+    ]
+  },
+  {
+    "code": "MG20",
+    "title": "Chronic pain",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": []
+  },
+  {
+    "code": "MG26",
+    "title": "Weight loss",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "unintentional weight loss"
+    ]
+  },
+  {
+    "code": "MG43",
+    "title": "Fatigue",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "tiredness",
+      "lethargy"
+    ]
+  },
+  {
+    "code": "MG50",
+    "title": "Lymphadenopathy",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "enlarged lymph nodes"
+    ]
+  },
+  {
+    "code": "MB48",
+    "title": "Seizure, unspecified",
+    "chapter": "21 Symptoms, signs or clinical findings",
+    "synonyms": [
+      "convulsion NOS",
+      "fit"
+    ]
+  },
+  {
+    "code": "NA00",
+    "title": "Superficial injury of head",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "head laceration",
+      "scalp wound"
+    ]
+  },
+  {
+    "code": "NA07",
+    "title": "Fracture of skull",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "skull fracture"
+    ]
+  },
+  {
+    "code": "NE60",
+    "title": "Concussion",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "mild traumatic brain injury",
+      "commotio cerebri"
+    ]
+  },
+  {
+    "code": "NA0Z",
+    "title": "Intracranial injury",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "traumatic brain injury",
+      "extradural haematoma",
+      "subdural haematoma"
+    ]
+  },
+  {
+    "code": "NB32",
+    "title": "Fracture of rib",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "rib fracture"
+    ]
+  },
+  {
+    "code": "NC32",
+    "title": "Fracture of forearm",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "Colles fracture",
+      "radius fracture"
+    ]
+  },
+  {
+    "code": "NC52",
+    "title": "Fracture of femur",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "femoral fracture",
+      "hip fracture"
+    ]
+  },
+  {
+    "code": "NC72",
+    "title": "Fracture of ankle",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "ankle fracture"
+    ]
+  },
+  {
+    "code": "NC93",
+    "title": "Sprain of ankle",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "ankle sprain",
+      "ligament sprain"
+    ]
+  },
+  {
+    "code": "ND56",
+    "title": "Open wound",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "laceration",
+      "cut"
+    ]
+  },
+  {
+    "code": "NE2Z",
+    "title": "Foreign body in respiratory tract",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "aspirated foreign body",
+      "choking"
+    ]
+  },
+  {
+    "code": "NE40",
+    "title": "Foreign body in alimentary tract",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "swallowed foreign body"
+    ]
+  },
+  {
+    "code": "NE61",
+    "title": "Crush injury",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": []
+  },
+  {
+    "code": "NE81",
+    "title": "Snake bite envenoming",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "snakebite"
+    ]
+  },
+  {
+    "code": "NE83",
+    "title": "Animal bite",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "dog bite"
+    ]
+  },
+  {
+    "code": "NE60.1",
+    "title": "Drowning and non-fatal submersion",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "near drowning"
+    ]
+  },
+  {
+    "code": "NF00",
+    "title": "Poisoning by medication",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "drug overdose",
+      "paracetamol overdose"
+    ]
+  },
+  {
+    "code": "NF04",
+    "title": "Toxic effect of organophosphate",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "pesticide poisoning",
+      "organophosphate poisoning"
+    ]
+  },
+  {
+    "code": "NF08",
+    "title": "Toxic effect of alcohol",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "acute alcohol intoxication",
+      "methanol poisoning"
+    ]
+  },
+  {
+    "code": "NF2Z",
+    "title": "Heat stroke",
+    "chapter": "22 Injury, poisoning or certain other consequences of external causes",
+    "synonyms": [
+      "hyperthermia"
+    ]
+  },
+  {
+    "code": "QA00",
+    "title": "General examination",
+    "chapter": "24 Factors influencing health status",
+    "synonyms": [
+      "routine check-up",
+      "medical examination"
+    ]
+  },
+  {
+    "code": "QA02",
+    "title": "Contraceptive management",
+    "chapter": "24 Factors influencing health status",
+    "synonyms": [
+      "family planning"
+    ]
+  },
+  {
+    "code": "QA46",
+    "title": "Antenatal screening",
+    "chapter": "24 Factors influencing health status",
+    "synonyms": []
+  },
+  {
+    "code": "QC10",
+    "title": "Immunisation encounter",
+    "chapter": "24 Factors influencing health status",
+    "synonyms": [
+      "vaccination"
+    ]
+  },
+  {
+    "code": "QB95",
+    "title": "Follow-up examination",
+    "chapter": "24 Factors influencing health status",
+    "synonyms": [
+      "review appointment"
+    ]
+  },
+  {
+    "code": "QD85",
+    "title": "Problems related to housing or economic circumstances",
+    "chapter": "24 Factors influencing health status",
+    "synonyms": [
+      "financial hardship"
+    ]
+  },
+  {
+    "code": "QE12",
+    "title": "Non-adherence to medical treatment",
+    "chapter": "24 Factors influencing health status",
+    "synonyms": [
+      "treatment default",
+      "defaulted medication"
+    ]
+  },
+  {
+    "code": "QB40",
+    "title": "Palliative care encounter",
+    "chapter": "24 Factors influencing health status",
+    "synonyms": []
+  }
+]

@@ -1,0 +1,16 @@
+# Local/private reasoning requested by the candidate; keep it on disk, out of Git.
+reasoning.md
+
+# Python caches and local environments.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local secrets and generated outputs.
+.env
+.env.*
+!*.env.example
+outputs/
+artifacts/
