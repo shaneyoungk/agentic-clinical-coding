@@ -356,7 +356,7 @@ class CodingPolicy:
         # features are never inferred from the generic phrase "chest pain".
         if p(store, "chest_pain") and p(store, "chest_wall_tenderness") and p(store, "movement_worse", "deep_inspiration"):
             self._add(results, self._candidate(store, ("Costochondritis",), ("Reproducible chest wall pain",), .94, "localized chest pain reproduced over the chest wall with movement or inspiration", [f(store, "chest_pain"), f(store, "chest_wall_tenderness"), f(store, "movement_worse", "deep_inspiration")]), trace, "costochondritis")
-        if p(store, "chest_pain") and p(store, "retrosternal", "exertional"):
+        if p(store, "chest_pain") and p(store, "retrosternal") and p(store, "exertional"):
             pain_duration = self._number(store, "duration_minutes")
             prolonged = p(store, "prolonged_pain") or (pain_duration is not None and pain_duration > 20)
             if p(store, "rest_pain", "increasing_frequency") or prolonged:
@@ -364,6 +364,9 @@ class CodingPolicy:
                 self._add(results, self._candidate(store, ("Unstable angina",), ("Exertional chest pain",), .64, "chest discomfort has an acute-coronary-syndrome feature", [f(store, "chest_pain"), f(store, "rest_pain", "increasing_frequency", "prolonged_pain")], confidence="low", missing=missing, blockers=("acute coronary syndrome subtype is not established by the note",), flags=("urgent_cardiac_review",)), trace, "acute-coronary-syndrome-uncertain")
             elif p(store, "nitrate_relief") and (pain_duration is None or pain_duration <= 20) and (p(store, "exertional") or p(store, "retrosternal")):
                 self._add(results, self._candidate(store, ("Angina pectoris",), ("Exertional chest pain",), .86, "retrosternal exertional discomfort relieved by rest or nitrate without acute warning features", [f(store, "chest_pain"), f(store, "exertional"), f(store, "nitrate_relief")]), trace, "stable-angina")
+        elif p(store, "chest_pain") and p(store, "rest_pain"):
+            store.warnings.append("block_symptom_fallback: chest pain at rest requires an acute-coronary-syndrome assessment before symptom coding")
+            trace.append("rest-chest-pain-needs-workup")
 
         if p(store, "loin_pain") and p(store, "groin_radiation") and p(store, "colicky") and p(store, "haematuria"):
             self._add(results, self._candidate(store, ("Calculus of kidney or ureter",), ("Renal colic",), .95, "unilateral colicky loin-to-groin pain with haematuria", [f(store, "loin_pain"), f(store, "groin_radiation"), f(store, "colicky"), f(store, "haematuria")]), trace, "renal-colic")
@@ -427,11 +430,13 @@ class CodingPolicy:
                 male_without_prostate_workup = p(store, "male") and not p(store, "prostatitis", "prostatic_involvement")
                 lower_tract_exclusion = p(store, "fever", "systemic_upset")
                 sex_conflict = p(store, "female") and p(store, "male")
+                age = self._number(store, "age_years")
+                adult_female = p(store, "female") and (age is None or age >= 18)
                 if lower_tract_exclusion:
                     self._add(results, self._candidate(store, ("Acute cystitis",), ("Lower urinary tract infection",), .55, "lower-tract symptoms have a fever or systemic feature that prevents uncomplicated coding", [f(store, "dysuria"), f(store, "urinary_frequency", "urinary_urgency"), f(store, "fever", "systemic_upset")], confidence="low", blockers=("fever or systemic upset requires upper-tract/complicated-infection assessment",)), trace, "lower-uti-systemic-ambiguity")
-                elif recurrent or male_without_prostate_workup or sex_conflict or not p(store, "female"):
+                elif recurrent or male_without_prostate_workup or sex_conflict or not adult_female:
                     missing = ("structural-cause assessment for recurrent infection",) if recurrent else ("assessment for prostatic involvement",)
-                    if sex_conflict or not p(store, "female"):
+                    if sex_conflict or not adult_female:
                         missing = ("confirmation that the patient is a non-pregnant adult woman",)
                         blockers = ("the uncomplicated lower-tract rule is limited to a non-pregnant adult woman",)
                     else:
@@ -454,13 +459,18 @@ class CodingPolicy:
             store.warnings.append("block_symptom_fallback: bloody diarrhoea requires assessment for invasive infection or gastrointestinal bleeding")
             trace.append("bloody-diarrhoea-needs-workup")
         if p(store, "diarrhoea") and p(store, "pathogen"):
-            self._add(results, self._pathogen_candidate(store, trace), trace, "pathogen-gastroenteritis")
+            pathogen_candidate = self._pathogen_candidate(store, trace)
+            if pathogen_candidate is not None:
+                self._add(results, pathogen_candidate, trace, "pathogen-gastroenteritis")
+            else:
+                store.warnings.append("block_symptom_fallback: a documented pathogen needs an organism-specific catalogue entry")
+                trace.append("pathogen-catalogue-gap")
 
         # The age/frailty guidance adds documented complications to the
         # presenting gastrointestinal illness; it does not replace the source
         # illness.  Each complication is emitted as a secondary assignment.
         older_or_frail = self._at_least(store, "age_years", 70) or p(store, "frailty")
-        if older_or_frail and p(store, "diarrhoea", "vomiting"):
+        if older_or_frail and p(store, "diarrhoea") and p(store, "vomiting"):
             if p(store, "dehydration"):
                 self._add(results, self._candidate(store, ("Dehydration",), ("Gastroenteritis in the older adult",), .80, "older or frail patient with gastrointestinal illness and documented volume depletion", [f(store, "dehydration")], role="complication", problem="gastrointestinal complication"), trace, "older-adult-dehydration")
             if p(store, "acute_kidney_injury"):
@@ -508,7 +518,7 @@ class CodingPolicy:
 
         if p(store, "hip_pain"):
             hip_age = self._number(store, "age_years")
-            if hip_age is not None and hip_age >= 16 and p(store, "limp", "fever") and p(store, "inflammatory_markers"):
+            if hip_age is not None and hip_age >= 16 and p(store, "limp") and p(store, "fever") and p(store, "inflammatory_markers"):
                 if p(store, "aspiration"):
                     self._add(results, self._candidate(store, ("Septic arthritis",), ("Atraumatic painful hip",), .86, "acutely painful hip in an older child/adult with fever and raised inflammatory markers; aspiration documented", [f(store, "hip_pain"), f(store, "age_years"), f(store, "fever"), f(store, "inflammatory_markers"), f(store, "aspiration")], flags=("aspiration_before_antibiotics",)), trace, "septic-hip")
                 else:
@@ -530,8 +540,11 @@ class CodingPolicy:
             if p(store, "persistent_deficit") and not p(store, "resolved_deficit"):
                 self._add(results, self._candidate(store, ("Cerebral ischaemic stroke",), ("Transient focal neurological deficit",), .90, "focal neurological deficit persists at examination", [f(store, "focal_deficit"), f(store, "persistent_deficit")], flags=("urgent_review",)), trace, "persistent-stroke")
             elif p(store, "resolved_deficit"):
-                if self._at_least(store, "episode_count", 2) or p(store, "recurrent_event"):
-                    self._add(results, self._candidate(store, ("Cerebral ischaemic stroke",), ("Transient focal neurological deficit",), .68, "recurrent transient focal deficits form a high-risk cerebrovascular presentation", [f(store, "focal_deficit"), f(store, "resolved_deficit"), f(store, "episode_count", "recurrent_event")], confidence="low", blockers=("high-risk recurrent transient syndrome has no dedicated catalogue entry",), flags=("urgent_review",)), trace, "recurrent-tia-gap")
+                recurrent_count = self._at_least(store, "episode_count", 2) or p(store, "recurrent_event")
+                if recurrent_count and p(store, "recent_recurrence"):
+                    self._add(results, self._candidate(store, ("Cerebral ischaemic stroke",), ("Transient focal neurological deficit",), .68, "recurrent transient focal deficits form a high-risk cerebrovascular presentation", [f(store, "focal_deficit"), f(store, "resolved_deficit"), f(store, "episode_count", "recurrent_event"), f(store, "recent_recurrence")], confidence="low", blockers=("high-risk recurrent transient syndrome has no dedicated catalogue entry",), flags=("urgent_review",)), trace, "recurrent-tia-gap")
+                elif recurrent_count:
+                    self._add(results, self._candidate(store, ("Transient ischaemic attack",), ("Transient focal neurological deficit",), .55, "recurrent resolved deficits are documented but the required seven-day high-risk window is not established", [f(store, "focal_deficit"), f(store, "resolved_deficit"), f(store, "episode_count", "recurrent_event")], confidence="low", blockers=("the interval between recurrent transient deficits is required before assigning TIA or the high-risk syndrome",), missing=("timing of each neurological episode",), flags=("urgent_review",)), trace, "recurrent-tia-window-missing")
                 elif not self._at_least(store, "duration_minutes", 60) and not self._at_least(store, "duration_hours", 1):
                     self._add(results, self._candidate(store, ("Transient ischaemic attack",), ("Transient focal neurological deficit",), .88, "focal deficit resolved completely with no residual sign", [f(store, "focal_deficit"), f(store, "resolved_deficit")]), trace, "tia")
                 else:
@@ -599,7 +612,7 @@ class CodingPolicy:
         if early_pregnancy_context and p(store, "bleeding_early_pregnancy"):
             if p(store, "closed_os") and p(store, "viable_iup"):
                 self._add(results, self._candidate(store, ("Threatened abortion",), ("Threatened miscarriage and ectopic",), .93, "early-pregnancy bleeding with closed os and viable intrauterine pregnancy", [f(store, "bleeding_early_pregnancy"), f(store, "closed_os"), f(store, "viable_iup")]), trace, "threatened-miscarriage")
-            elif p(store, "pelvic_pain", "unilateral") and p(store, "haemodynamic_change", "orthostatic_change") and 6 <= (self._number(store, "gestational_weeks") or self._number(store, "duration_weeks") or 0) <= 8 and not p(store, "viable_iup"):
+            elif p(store, "pelvic_pain") and p(store, "unilateral") and p(store, "haemodynamic_change", "orthostatic_change") and 6 <= (self._number(store, "gestational_weeks") or self._number(store, "duration_weeks") or 0) <= 8 and not p(store, "viable_iup"):
                 self._add(results, self._candidate(store, ("Ectopic pregnancy",), ("Threatened miscarriage and ectopic",), .90, "early-pregnancy bleeding and unilateral pelvic pain with haemodynamic change before intrauterine visualisation", [f(store, "bleeding_early_pregnancy"), f(store, "pelvic_pain", "unilateral"), f(store, "orthostatic_change")], flags=("urgent_review",)), trace, "ectopic-pregnancy")
             else:
                 self._add(results, self._candidate(store, ("Threatened abortion",), ("Threatened miscarriage and ectopic",), .55, "pregnancy bleeding does not yet distinguish threatened miscarriage from ectopic pregnancy", [f(store, "bleeding_early_pregnancy")], confidence="low", blockers=("cervical-os status, ultrasound location/viability and haemodynamic status are unresolved",), flags=("urgent_review",)), trace, "pregnancy-bleeding-uncertain")
@@ -757,7 +770,7 @@ class CodingPolicy:
                     before = text[boundary:found.start()]
                     prior_line = text[max(0, text.rfind("\n", 0, boundary - 1)):boundary]
                     context = f"{prior_line} {before}"
-                    if re.search(assessment_markers, context) and not re.search(r"\b(?:rule out|query|possible|family history|no evidence of|denies)\b", before[-90:]):
+                    if re.search(assessment_markers, context) and not re.search(r"\b(?:rule out|query|possible|family history|no evidence of|denies|no|without|not|negative for|ruled out|excluded|absence of)\b", before[-90:]):
                         match = found
                         break
             if match is None:

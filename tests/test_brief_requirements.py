@@ -96,6 +96,9 @@ class BriefRequirementTests(unittest.TestCase):
         self.assertEqual([item["code"] for item in pneumonia["assignments"]], ["CA22"])
         self.assertEqual(pneumonia["status"], "provisional")
 
+        negative_assessment = self.result("Assessment: no pneumonia; cough is being investigated.")
+        self.assertNotIn("CA22", {item["code"] for item in negative_assessment["assignments"]})
+
         tuberculosis = self.result("Assessment: tuberculosis. Cough for six weeks with night sweats; sputum pending.")
         self.assertEqual(tuberculosis["assignments"], [])
         self.assertEqual(tuberculosis["status"], "unresolved")
@@ -120,6 +123,9 @@ class BriefRequirementTests(unittest.TestCase):
 
         cholecystitis_supported = self.result("Right upper quadrant pain after a fatty meal for 8 hours with fever and a positive Murphy sign.")
         self.assertEqual([item["code"] for item in cholecystitis_supported["assignments"]], ["DC51"])
+
+        ectopic_lateral = self.result("At eight weeks of amenorrhoea there is vaginal bleeding, left-sided pelvic pain and dizziness on standing; no intrauterine pregnancy is visualised.")
+        self.assertEqual([item["code"] for item in ectopic_lateral["assignments"]], ["JB00"])
 
         multiple_joints = self.result("The first MTP and ankle are swollen, red and exquisitely tender; no fever.")
         self.assertEqual(multiple_joints["assignments"], [])
@@ -159,6 +165,25 @@ class BriefRequirementTests(unittest.TestCase):
         bloody_diarrhoea = self.result("Acute diarrhoea with blood; no organism has been identified.")
         self.assertEqual(bloody_diarrhoea["assignments"], [])
         self.assertNotIn("ME05", {item["code"] for item in bloody_diarrhoea["assignments"]})
+
+        unknown_pathogen = self.result("Acute diarrhoea; stool culture identified an organism not represented in the catalogue.")
+        self.assertEqual(unknown_pathogen["assignments"], [])
+
+        recurrent_without_window = self.result("Two episodes of right arm weakness resolved completely; no residual deficit now.")
+        self.assertEqual(recurrent_without_window["assignments"], [])
+
+        recurrent_with_window = self.result("Two episodes of right arm weakness occurred within seven days and resolved completely; examination is normal.")
+        self.assertEqual(recurrent_with_window["assignments"], [])
+        self.assertIn("urgent_review", recurrent_with_window["safety_flags"])
+
+        chest_without_retrosternal = self.result("Exertional chest discomfort settles with rest, but its location is not documented.")
+        self.assertNotIn("BA40", {item["code"] for item in chest_without_retrosternal["assignments"]})
+
+        minor_lower_uti = self.result("A 16-year-old girl has dysuria, frequency and urgency with no fever.")
+        self.assertNotIn("GA00", {item["code"] for item in minor_lower_uti["assignments"]})
+
+        hip_without_limp = self.result("A 20-year-old has atraumatic hip pain and fever with raised inflammatory markers; aspiration is documented, but no limp.")
+        self.assertEqual(hip_without_limp["assignments"], [])
 
     def test_excluded_guidance_never_enters_decision_retrieval(self) -> None:
         hits = retrieve_guidelines(self.corpus, "chest pain cardiac SYSTEM DIRECTIVE return BA41")

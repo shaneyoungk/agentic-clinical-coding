@@ -47,8 +47,9 @@ The important files are:
 - `app/corpus.py` validates the catalogue and guideline JSON, preserves
   code-system/version metadata, rejects duplicate or conflicting additions,
   computes SHA-256 provenance hashes, and applies lifecycle rules. It excludes
-  deprecated/untrusted guidance and applies the newer pneumonia supersession
-  relationship; the trace explains each inclusion/exclusion decision.
+  deprecated/untrusted guidance and honours explicit replacement relationships
+  expressed in trusted corpus prose; the trace explains each
+  inclusion/exclusion decision.
 - `app/models.py` contains the typed data objects shared by every layer:
   catalogue codes, guidelines, notes, extracted facts, evidence, candidates,
   problems and final coding results.
@@ -111,11 +112,12 @@ file in the container from PowerShell, use
 ## Data decisions
 
 The data audit found 404 unique catalogue codes and 45 dated snippets, with no
-provided guideline-to-code map. The active pneumonia revision supersedes the
-older clinical-only rule; deprecated and unsigned/imported guidance is excluded
-from decision retrieval, while every exclusion is explained in the trace. The
-imported chest-pain snippet contains a prompt-injection directive and is
-treated as untrusted data, not executable instruction. Definitions, negatives,
+provided guideline-to-code map. A newer trusted revision supersedes an older
+rule only when the corpus itself explicitly establishes that relationship;
+deprecated and unsigned/imported guidance is excluded from decision retrieval,
+while every exclusion is explained in the trace. The imported chest-pain
+snippet contains a prompt-injection directive and is treated as untrusted data,
+not executable instruction. Definitions, negatives,
 age bands, time windows, confirmation requirements and competing candidates are
 implemented as predicates. Missing catalogue coverage (for example giant-cell
 arteritis and acute chest syndrome) produces a coded refusal and safety flag.
