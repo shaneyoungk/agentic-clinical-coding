@@ -191,6 +191,10 @@ class Candidate:
         return {
             "code": self.code.code,
             "title": self.code.title,
+            "guideline_id": self.guideline.id,
+            "role": self.role,
+            "provisional": self.provisional,
+            "score": round(self.score, 3),
             "confidence": self.confidence,
             "support": self.support,
             "missing_information": list(self.missing),
