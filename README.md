@@ -72,6 +72,11 @@ The important files are:
 - `benchmark/notes.jsonl` contains readable local benchmark notes and
   `benchmark/expected.json` contains their expected code sets. These are
   development checks, not training data.
+- `benchmark/unseen_notes.jsonl` and `benchmark/unseen_expected.json` are a
+  separate 35-note holdout-style suite with paraphrases and adversarial edge
+  cases. Run it with:
+
+  `python -m app.evaluate --notes benchmark/unseen_notes.jsonl --expected benchmark/unseen_expected.json`
 - `tests/test_system.py` covers corpus loading, lifecycle, input accounting
   and smoke assignments. `tests/test_edge_cases.py` covers negation/history
   scope, prompt injection, missing catalogue conditions, incomplete
