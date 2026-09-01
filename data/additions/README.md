@@ -4,9 +4,7 @@ These files are intentionally separate from the 404-entry exercise catalogue
 and the supplied guideline corpus. They are opt-in at runtime:
 
 ```text
-python -m app.cli notes.jsonl \
-  --extra-catalogue data/additions/icd_catalog_additions.json \
-  --extra-guidelines data/additions/guideline_additions.json
+python -m app.cli notes.jsonl --extra-catalogue data/additions/icd_catalog_additions.json --extra-guidelines data/additions/guideline_additions.json
 ```
 
 ## Catalogue addition
@@ -19,8 +17,10 @@ Reference Guide, February 2023, page 349 (Spanish edition):
 
 https://icd.who.int/es/docs/GuiaReferencia_CIE_11_Feb2023.pdf
 
-The record identifies the WHO ICD-11 MMS code system and the `2025-01`
-linearization release. It is not merged into the supplied default corpus, so
+The record identifies the WHO ICD-11 MMS code system and the `2023-01`
+linearization release corresponding to the cited reference guide. The WHO
+classification is licensed under CC BY-ND 3.0 IGO; see
+https://icd.who.int/docs/icd-api/license/. It is not merged into the supplied default corpus, so
 the default benchmark remains reproducible against the exercise data.
 
 ## Guideline addition

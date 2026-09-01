@@ -86,7 +86,10 @@ The important files are:
 - `tests/test_system.py` covers corpus loading, lifecycle, input accounting
   and smoke assignments. `tests/test_edge_cases.py` covers negation/history
   scope, prompt injection, missing catalogue conditions, incomplete
-  thresholds, provenance and malformed input. Run both with the command below.
+  thresholds, provenance and malformed input. `tests/test_brief_requirements.py`
+  directly exercises non-obvious restrictions, renamed corpus identifiers,
+  gap refusal, sourced extensions and trust downgrades. Run all three with the
+  command below.
 - `schema/result.schema.json` documents the versioned JSON output contract.
 - `Dockerfile` and `compose.yaml` provide the clean-clone container workflow;
   `examples/smoke_notes.jsonl` is the default input for `docker compose up`.
