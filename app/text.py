@@ -313,8 +313,9 @@ def _assertion(normalized: str, sentence_start: int, start: int, end: int | None
         return "possible", "current", "patient"
     # "No result recorded/available" means the test is missing, not that it
     # returned negative. Preserve that distinction for confirmation gates.
-    local_before = re.split(r"[,;:]", before)[-1]
-    local_after = re.split(r"[,;:]", after)[0]
+    scope_break = r"[,;:]|\b(?:but|however|although)\b"
+    local_before = re.split(scope_break, before)[-1]
+    local_after = re.split(scope_break, after)[0]
     context = f"{local_before} {local_after}"
     if re.search(r"\b(?:no|without|not)\b[^.!?\n]{0,90}\b(?:result|recorded|available|performed|done)\b", context):
         return "possible", "current", "patient"
