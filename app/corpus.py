@@ -38,6 +38,35 @@ class Corpus:
         standard supersedes older pneumonia confirmation snippets. This is a
         corpus-level relationship, not a note/code special case.
         """
+        eligible, replacements = self._guideline_lifecycle(as_of)
+        return tuple(item for item in eligible if item.id not in replacements)
+
+    def guideline_lifecycle(self, as_of: str | None = None) -> list[dict[str, object]]:
+        """Explain why every guideline is or is not decision-active."""
+        as_of_key = _date_key(as_of) if as_of else None
+        _, replacements = self._guideline_lifecycle(as_of)
+        decisions: list[dict[str, object]] = []
+        for item in self.guidelines:
+            reasons: list[str] = []
+            if item.status != "active":
+                reasons.append(f"status={item.status}")
+            if item.trust != "normal":
+                reasons.append(f"trust={item.trust}")
+            if as_of_key is not None and item.effective_key > as_of_key:
+                reasons.append(f"effective_after_as_of={as_of}")
+            if item.id in replacements:
+                reasons.append("superseded_by_newer_guidance")
+            decisions.append({
+                "id": item.id,
+                "effective": item.effective,
+                "status": item.status,
+                "trust": item.trust,
+                "included": not reasons,
+                "reasons": reasons or ["active_trusted_current"],
+            })
+        return decisions
+
+    def _guideline_lifecycle(self, as_of: str | None) -> tuple[list[Guideline], set[str]]:
         as_of_key = _date_key(as_of) if as_of else None
         eligible = [
             item
@@ -56,7 +85,7 @@ class Corpus:
                     if older.id != newer.id and "pneumonia" in f"{older.title} {older.text}".lower():
                         if older.effective_key < newer.effective_key:
                             replacements.add(older.id)
-        return tuple(item for item in eligible if item.id not in replacements)
+        return eligible, replacements
 
     def searchable_guidelines(self) -> tuple[Guideline, ...]:
         """Include historical/untrusted documents for audit retrieval."""
@@ -92,10 +121,16 @@ def _metadata_for_guideline(record: dict[str, Any]) -> tuple[str, str]:
     haystack = " ".join(
         str(record.get(key, "")) for key in ("title", "source", "text")
     ).lower()
-    status = "deprecated" if "deprecated" in haystack or "historical reference" in haystack else "active"
-    trust = "untrusted" if any(
+    derived_status = "deprecated" if "deprecated" in haystack or "historical reference" in haystack else "active"
+    derived_trust = "untrusted" if any(
         marker in haystack for marker in ("unsigned", "system directive", "processing assistant")
     ) else "normal"
+    status = record.get("status", derived_status)
+    trust = record.get("trust", derived_trust)
+    if status not in {"active", "deprecated"}:
+        raise CorpusError(f"invalid guideline status: {status!r}")
+    if trust not in {"normal", "untrusted"}:
+        raise CorpusError(f"invalid guideline trust: {trust!r}")
     return status, trust
 
 
@@ -125,8 +160,21 @@ def load_catalogue(path: str | Path) -> tuple[CodeEntry, ...]:
             raise CorpusError(f"invalid title/chapter at catalogue record {index}")
         if not isinstance(synonyms, list) or any(not isinstance(item, str) for item in synonyms):
             raise CorpusError(f"invalid synonyms at catalogue record {index}")
+        code_system = record.get("code_system", "local-exercise-catalogue")
+        version = record.get("version", "provided")
+        if not isinstance(code_system, str) or not code_system.strip():
+            raise CorpusError(f"invalid code_system at catalogue record {index}")
+        if not isinstance(version, str) or not version.strip():
+            raise CorpusError(f"invalid version at catalogue record {index}")
         seen.add(code)
-        entries.append(CodeEntry(code, title.strip(), chapter.strip(), tuple(s.strip() for s in synonyms if s.strip())))
+        entries.append(CodeEntry(
+            code,
+            title.strip(),
+            chapter.strip(),
+            tuple(s.strip() for s in synonyms if s.strip()),
+            code_system.strip(),
+            version.strip(),
+        ))
     return tuple(entries)
 
 

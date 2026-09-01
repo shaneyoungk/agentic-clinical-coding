@@ -42,6 +42,7 @@ class CodingEngine:
                 "catalogue_records": len(self.corpus.catalogue),
                 "guideline_records": len(self.corpus.guidelines),
                 "active_guideline_ids": [item.id for item in self.corpus.active_guidelines()],
+                "guideline_lifecycle": self.corpus.guideline_lifecycle(),
                 "sha256": self.corpus.hashes,
             },
             "retrieval": {

@@ -8,6 +8,7 @@
     "schema_version": {"const": "1.0"},
     "note_id": {"type": "string"},
     "input_position": {"type": "integer", "minimum": 1},
+    "note_text": {"type": "string"},
     "input_quality": {"type": "array", "items": {"type": "string"}},
     "status": {"enum": ["accepted", "provisional", "review", "unresolved"]},
     "confidence": {"enum": ["high", "moderate", "low"]},
@@ -27,6 +28,8 @@
       "properties": {
         "code": {"type": "string"},
         "title": {"type": "string"},
+        "code_system": {"type": "string"},
+        "catalogue_version": {"type": "string"},
         "guideline_id": {"type": "string"},
         "role": {"type": "string"},
         "provisional": {"type": "boolean"},

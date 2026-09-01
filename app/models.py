@@ -191,6 +191,8 @@ class Candidate:
         return {
             "code": self.code.code,
             "title": self.code.title,
+            "code_system": self.code.code_system,
+            "catalogue_version": self.code.version,
             "guideline_id": self.guideline.id,
             "role": self.role,
             "provisional": self.provisional,
@@ -256,6 +258,7 @@ class CodingResult:
             "schema_version": "1.0",
             "note_id": self.note.note_id,
             "input_position": self.note.position,
+            "note_text": self.note.text,
             "input_quality": list(self.note.input_quality),
             "status": self.status,
             "confidence": self.confidence,
