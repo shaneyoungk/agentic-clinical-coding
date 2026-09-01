@@ -8,22 +8,209 @@ accepted assignment, a provisional/review assignment, or an explicit
 unresolved refusal; unsupported findings are never force-fit to the nearest
 code.
 
-Run locally:
+## Run it from a clean clone
 
-```text
-python -m app.cli path/to/notes.jsonl --output results.jsonl
+Run the commands below from the repository root, the folder containing
+`BRIEF.md`. The project has no runtime Python dependencies and does not need a
+model key, database, or network connection. Install Python 3.12 or newer; the
+implementation uses only the Python standard library. Docker Desktop is
+optional and is needed only for the container commands below.
+
+Check the Python installation with this single command:
+
+```powershell
+python --version
+```
+
+If `python` is not recognised on Windows, install Python 3.12+ with the
+official installer and enable its PATH option. There is no `pip install`
+step for this repository.
+
+### Run the included smoke example
+
+This runs three readable example notes and prints one compact JSON result per
+input record to the terminal:
+
+```powershell
+python -m app.cli examples/smoke_notes.jsonl
+```
+
+The first two examples receive evidence-backed assignments and the third is
+an intentional unresolved/refusal case. The same command works through the
+shorter module entry point:
+
+```powershell
+python -m app examples/smoke_notes.jsonl
+```
+
+To save the smoke results instead, use this single command:
+
+```powershell
+python -m app.cli examples/smoke_notes.jsonl --output smoke_results.jsonl
+```
+
+`smoke_results.jsonl` is written to the current directory (normally the
+repository root). The output file is JSONL: each line is one complete result,
+not one combined JSON array. Read the saved lines in PowerShell with:
+
+```powershell
+Get-Content .\smoke_results.jsonl
+```
+
+To display the most useful fields from every saved line in PowerShell, run:
+
+```powershell
+Get-Content .\smoke_results.jsonl | ForEach-Object { $_ | ConvertFrom-Json | Select-Object note_id,status,confidence,assignments,missing_information }
+```
+
+If `--output` is omitted, results go to standard output and no result file is
+created. If `--output path` is supplied, the parent folder must already exist.
+
+### Run all automated tests
+
+This is the one-command local test suite:
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+It runs `tests/test_system.py`, `tests/test_edge_cases.py`, and
+`tests/test_brief_requirements.py`. The tests cover normal assignments,
+negation and history scope, missing catalogue entries, unsafe corpus content,
+thresholds, input accounting, provenance, lifecycle filtering, paraphrases,
+and refusal/safety behavior.
+
+### Run the main benchmark
+
+Run the 33-note development benchmark with:
+
+```powershell
 python -m app.evaluate
 ```
 
-Input can be JSON, JSONL, or one plain-text note per line. Each assignment
-contains the catalogue code, code-system/version, guideline ID, quoted note
-evidence and confidence factors. The original `note_text` is retained in every
-result, so malformed, unsupported or only-partially-understood input is still
-auditable. `trace` records corpus hashes, retrieval hits, extracted facts,
-guideline lifecycle decisions and policy branches. No model key is required;
-an LLM adapter would be an optional future proposer whose output must pass the
-same policy and evidence checks.
-The output contract is documented in `schema/result.schema.json`.
+This reads `benchmark/notes.jsonl` and grades it against
+`benchmark/expected.json`. The command prints a JSON report in the terminal.
+The important fields are:
+
+- `exact_code_accuracy`: the proportion of notes whose sorted assigned code
+  list exactly equals the expected code list. An expected empty list means the
+  correct behavior is an explicit unresolved result.
+- `accounted_rate`: the proportion of input notes that produced one of the
+  allowed statuses: `accepted`, `provisional`, `review`, or `unresolved`.
+- `rows`: note-by-note expected codes, actual codes, match status, and result
+  status for diagnosing failures.
+
+The benchmark data is local development data, not training data. It is not
+used to alter the system at runtime.
+
+To save the benchmark report as a JSON file in the repository root instead of
+printing it only in the terminal, run:
+
+```powershell
+python -m app.evaluate | Out-File -FilePath benchmark_report.json -Encoding utf8
+```
+
+Read that report with:
+
+```powershell
+Get-Content .\benchmark_report.json
+```
+
+### Run the paraphrase and adversarial holdout
+
+Run the separate 35-note holdout-style suite with:
+
+```powershell
+python -m app.evaluate --notes benchmark/unseen_notes.jsonl --expected benchmark/unseen_expected.json
+```
+
+Its notes and expected answers are stored in the two `benchmark/unseen_*`
+files. It is a local regression check for paraphrases, incomplete evidence,
+catalogue gaps, and competing diagnoses; the private evaluator described in
+`BRIEF.md` remains the real unseen-note evaluation.
+
+### Run your own input file
+
+Point the positional input argument at any JSON, JSONL, or plain-text file:
+
+```powershell
+python -m app.cli path\to\your_notes.jsonl --output results.jsonl
+```
+
+The input path is never hard-coded. Supported forms are:
+
+- JSONL: one object per line, normally `{"note_id":"case-1","text":"..."}`.
+- JSON array: a file containing several note objects.
+- JSON object containing a `notes` array.
+- Plain text: one note per line.
+
+For JSON objects, the text can be in `text`, `note`, `note_text`,
+`consult_note`, or `body`. `note_id` is preferred; `id` and `encounter_id`
+are also accepted. Missing IDs receive a stable line-based fallback. Blank,
+malformed, or unsupported records are emitted as unresolved results with an
+`input_quality` explanation rather than being dropped.
+
+### Run with the separately sourced data additions
+
+The default run uses exactly the supplied 404-entry catalogue and 45 supplied
+guideline snippets. The separately sourced WHO additions are opt-in. Enable
+both for a run with the necrotising-fasciitis catalogue entry and the malaria
+diagnostic guideline:
+
+```powershell
+python -m app.cli path\to\your_notes.jsonl --extra-catalogue data\additions\icd_catalog_additions.json --extra-guidelines data\additions\guideline_additions.json --output enriched_results.jsonl
+```
+
+The addition files, provenance, sources, and reasons for keeping them separate
+are documented in `data/additions/README.md`.
+
+### Run the container
+
+Docker Desktop is optional. From the repository root, this builds the image
+and runs the default smoke input:
+
+```powershell
+docker compose up --build
+```
+
+To run a host input file in the container and save results back to the
+repository root, use this single PowerShell command:
+
+```powershell
+docker compose run --rm -v "${PWD}:/input" coder /input/your_notes.jsonl --output /input/docker_results.jsonl
+```
+
+The container uses the same CLI and output contract as the native command.
+
+### Read a result
+
+Every output line preserves the original `note_text` and contains the same
+top-level fields:
+
+- `status`: `accepted`, `provisional`, `review`, or `unresolved`.
+- `confidence`: `high`, `moderate`, or `low`.
+- `assignments`: selected code(s), title, catalogue metadata, guideline ID,
+  confidence, support, and note/catalogue/guideline evidence.
+- `candidates`: plausible but unselected alternatives shown for review.
+- `missing_information` and `unresolved_reasons`: what prevented a stronger
+  decision. An unresolved result is deliberate when the catalogue is missing
+  the condition or the note lacks required evidence.
+- `safety_flags`: urgent review, confirmation, or do-not-force-fit warnings.
+- `trace`: corpus hashes and lifecycle decisions, retrieval hits, extracted
+  facts, and policy branches used to reach the result.
+
+The versioned output contract is in `schema/result.schema.json`. The local
+evaluator grades assigned code sets and input accounting; it does not replace
+human review of the evidence, confidence, refusal reason, or safety flags.
+The private grader runs the system unmodified against notes not included in
+this repository, so benchmark files are only regression checks. No model key
+is required; an LLM adapter would be an optional future proposer whose output
+must pass the same policy and evidence checks.
+
+For a successful run the CLI exits with status `0`. An unreadable input or
+invalid corpus is a fatal command error; an individual blank, malformed, or
+unsupported note is intentionally non-fatal and becomes an unresolved output
+line so record accounting is preserved.
 
 ## Repository map and execution flow
 
@@ -89,25 +276,13 @@ The important files are:
   scope, prompt injection, missing catalogue conditions, incomplete
   thresholds, provenance and malformed input. `tests/test_brief_requirements.py`
   directly exercises non-obvious restrictions, renamed corpus identifiers,
-  gap refusal, sourced extensions and trust downgrades. Run all three with the
-  command below.
+  gap refusal, sourced extensions and trust downgrades. Run all three with
+  `python -m unittest discover -s tests -v`.
 - `schema/result.schema.json` documents the versioned JSON output contract.
 - `Dockerfile` and `compose.yaml` provide the clean-clone container workflow;
   `examples/smoke_notes.jsonl` is the default input for `docker compose up`.
 - `reasoning.md` is the candidate's private design record. It is intentionally
   ignored by Git at the user's request and is not required at runtime.
-
-For a quick beginner walkthrough, run `python -m app.cli examples/smoke_notes.jsonl`.
-The first two records receive evidence-backed
-assignments; the third demonstrates an unresolved result. Open one JSON line
-and inspect `assignments` for proposed codes, `problems` for candidates and
-missing information, and `trace` for how the decision was made. Then run
-`python -m unittest discover -s tests -v` and `python -m app.evaluate` to
-verify the installation.
-
-`docker compose up` builds and runs the included smoke file. To run a supplied
-file in the container from PowerShell, use
-`docker compose run --rm -v "${PWD}:/input:ro" coder /input/notes.jsonl`.
 
 ## Data decisions
 
