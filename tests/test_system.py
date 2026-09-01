@@ -52,13 +52,20 @@ class CorpusTests(unittest.TestCase):
         )
         entry = corpus.code_by_code["1B71"]
         self.assertEqual(entry.code_system, "http://id.who.int/icd/release/11/mms")
-        self.assertEqual(entry.version, "2025-01")
+        self.assertEqual(entry.version, "2023-01")
         self.assertIn("EXT-WHO-MALARIA-001", {item.id for item in corpus.active_guidelines()})
 
         note = "Pain out of proportion with rapidly progressive redness and skin anaesthesia."
         result = CodingEngine(corpus).process(NoteRecord("gap-added", note, 1)).as_dict()
         self.assertEqual([item["code"] for item in result["assignments"]], ["1B71"])
         self.assertEqual(result["assignments"][0]["code_system"], "http://id.who.int/icd/release/11/mms")
+
+        malaria = CodingEngine(corpus).process(NoteRecord(
+            "malaria-added-guideline",
+            "Falciparum malaria with a positive malaria RDT.",
+            1,
+        )).as_dict()
+        self.assertEqual(malaria["assignments"][0]["guideline_id"], "EXT-WHO-MALARIA-001")
 
 
 class FactTests(unittest.TestCase):
