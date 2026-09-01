@@ -33,10 +33,11 @@ class Corpus:
         """Return current trusted guidance, applying explicit lifecycle signals.
 
         The supplied snippets do not carry a formal supersession field. We
-        therefore derive a narrow, explainable replacement rule from prose:
-        a newer pneumonia confirmation document that says it replaces the old
-        standard supersedes older pneumonia confirmation snippets. This is a
-        corpus-level relationship, not a note/code special case.
+        therefore derive an explainable replacement relationship from prose:
+        a newer trusted record that explicitly says it replaces or supersedes
+        an older record with the same source/topic signature makes the older
+        record historical. This is deliberately corpus-generic; no guideline
+        identifier, diagnosis code or disease name is special-cased here.
         """
         eligible, replacements = self._guideline_lifecycle(as_of)
         return tuple(item for item in eligible if item.id not in replacements)
@@ -78,13 +79,20 @@ class Corpus:
         replacements: set[str] = set()
         for newer in eligible:
             body = f"{newer.title} {newer.text}".lower()
-            if "replaces" not in body:
+            marker = re.search(r"\b(?:replaces|supersedes|supplants)\b", body)
+            if marker is None:
                 continue
-            if "pneumonia" in body and "confirmation" in body:
-                for older in eligible:
-                    if older.id != newer.id and "pneumonia" in f"{older.title} {older.text}".lower():
-                        if older.effective_key < newer.effective_key:
-                            replacements.add(older.id)
+            replacement_tail = body[marker.end():]
+            replacement_terms = _content_terms(replacement_tail)
+            newer_topic = _content_terms(f"{newer.title} {newer.source}")
+            for older in eligible:
+                if older.id == newer.id or older.effective_key >= newer.effective_key:
+                    continue
+                older_topic = _content_terms(f"{older.title} {older.source}")
+                shared_reference = len(replacement_terms & older_topic) >= 2
+                shared_title = len(_content_terms(newer.title) & _content_terms(older.title)) >= 2
+                if shared_reference or shared_title:
+                    replacements.add(older.id)
         return eligible, replacements
 
     def searchable_guidelines(self) -> tuple[Guideline, ...]:
@@ -102,6 +110,19 @@ def _date_key(value: str | None) -> int | None:
     if not 1 <= month_int <= 12:
         raise CorpusError(f"invalid month in date: {value!r}")
     return int(year) * 100 + month_int
+
+
+_CORPUS_STOPWORDS = {
+    "a", "an", "and", "as", "at", "by", "for", "from", "in", "of", "on",
+    "or", "the", "to", "with", "where", "this", "that", "new", "old",
+}
+
+
+def _content_terms(value: str) -> set[str]:
+    return {
+        token for token in re.findall(r"[a-z0-9]+", value.casefold())
+        if token not in _CORPUS_STOPWORDS and len(token) > 2
+    }
 
 
 def _sha256(path: Path) -> str:
@@ -131,6 +152,8 @@ def _metadata_for_guideline(record: dict[str, Any]) -> tuple[str, str]:
     # the safety check.
     status = "deprecated" if derived_status == "deprecated" else record.get("status", derived_status)
     trust = "untrusted" if derived_trust == "untrusted" else record.get("trust", derived_trust)
+    if not isinstance(status, str) or not isinstance(trust, str):
+        raise CorpusError("guideline status and trust must be strings")
     if status not in {"active", "deprecated"}:
         raise CorpusError(f"invalid guideline status: {status!r}")
     if trust not in {"normal", "untrusted"}:
@@ -196,7 +219,10 @@ def load_guidelines(path: str | Path) -> tuple[Guideline, ...]:
             if key not in record:
                 raise CorpusError(f"guideline record {index} missing {key!r}")
         identifier = record["id"]
-        if not isinstance(identifier, str) or not identifier.strip() or identifier in seen:
+        if not isinstance(identifier, str) or not identifier.strip():
+            raise CorpusError(f"invalid or duplicate guideline ID: {identifier!r}")
+        identifier = identifier.strip()
+        if identifier in seen:
             raise CorpusError(f"invalid or duplicate guideline ID: {identifier!r}")
         if not all(isinstance(record[key], str) and record[key].strip() for key in ("title", "source", "text")):
             raise CorpusError(f"invalid guideline text metadata at record {index}")
@@ -205,7 +231,7 @@ def load_guidelines(path: str | Path) -> tuple[Guideline, ...]:
         status, trust = _metadata_for_guideline(record)
         seen.add(identifier)
         guidelines.append(Guideline(
-            id=identifier.strip(),
+            id=identifier,
             title=record["title"].strip(),
             source=record["source"].strip(),
             effective=effective,

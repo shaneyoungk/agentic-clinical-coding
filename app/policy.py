@@ -36,7 +36,12 @@ class CodingPolicy:
         candidates.extend(self._routine(store, rule_trace))
         candidates.extend(self._emergencies(store, rule_trace))
         candidates.extend(self._specific_rules(store, rule_trace))
-        candidates.extend(self._explicit_diagnoses(store, rule_trace))
+        # Explicit diagnosis text is a fallback for conditions for which no
+        # specialized safety rule fired.  It must never bypass a specialized
+        # rule's missing-confirmation blocker (for example "Assessment:
+        # pneumonia" cannot override the active imaging requirement).
+        if not candidates:
+            candidates.extend(self._explicit_diagnoses(store, rule_trace))
 
         # A single code should not be emitted twice when a general and a
         # specific predicate both fired. Keep the stronger candidate and keep
@@ -266,7 +271,7 @@ class CodingPolicy:
             return [], viable
         selected = [top]
         for candidate in viable[1:]:
-            if candidate.role == "complication" and candidate.code.code != top.code.code:
+            if candidate.role in {"complication", "source"} and candidate.code.code != top.code.code:
                 selected.append(candidate)
         return selected, [item for item in candidates if item not in selected and (item.missing or item.blockers)]
 
@@ -305,11 +310,11 @@ class CodingPolicy:
             airway_code = ("Epiglottitis",) if self._pos(store, "stridor", "difficulty_swallowing_saliva") else ("Peritonsillar abscess",)
             self._add(results, self._candidate(store, airway_code, ("Tonsillitis",), .96, "airway warning feature takes precedence over routine sore-throat coding", [self._fact(store, "stridor", "drooling", "trismus", "muffled_voice", "difficulty_swallowing_saliva")], flags=("airway_first", "urgent_review")), trace, "airway-warning")
 
-        if self._pos(store, "head_injury") and self._pos(store, "focal_deficit", "repeated_vomiting", "convulsion", "anticoagulant", "persistent_deficit"):
+        if self._pos(store, "head_injury") and self._pos(store, "focal_deficit", "repeated_vomiting", "convulsion", "anticoagulant", "persistent_deficit", "intracranial_warning"):
             self._add(results, self._candidate(store, ("Intracranial injury",), ("Head injury",), .96, "head injury with an intracranial-injury warning feature", [self._fact(store, "head_injury"), self._fact(store, "focal_deficit", "repeated_vomiting", "convulsion", "anticoagulant", "persistent_deficit")], flags=("imaging_required", "urgent_review")), trace, "intracranial-injury")
 
-        if self._pos(store, "pain_disproportionate", "rapid_progression", "skin_anaesthesia", "crepitus"):
-            red_flag_facts = [self._fact(store, "pain_disproportionate", "rapid_progression", "skin_anaesthesia", "crepitus")]
+        if self._pos(store, "pain_disproportionate", "rapid_progression", "skin_anaesthesia", "crepitus", "systemic_toxicity"):
+            red_flag_facts = [self._fact(store, "pain_disproportionate", "rapid_progression", "skin_anaesthesia", "crepitus", "systemic_toxicity")]
             if self._code("Necrotising fasciitis") is not None:
                 candidate = self._candidate(
                     store,
@@ -379,20 +384,27 @@ class CodingPolicy:
             else:
                 recurrent = self._at_least(store, "episode_count", 3)
                 male_without_prostate_workup = p(store, "male") and not p(store, "prostatitis", "prostatic_involvement")
-                if recurrent or male_without_prostate_workup:
+                lower_tract_exclusion = p(store, "fever", "systemic_upset")
+                sex_conflict = p(store, "female") and p(store, "male")
+                if lower_tract_exclusion:
+                    self._add(results, self._candidate(store, ("Acute cystitis",), ("Lower urinary tract infection",), .55, "lower-tract symptoms have a fever or systemic feature that prevents uncomplicated coding", [f(store, "dysuria"), f(store, "urinary_frequency", "urinary_urgency"), f(store, "fever", "systemic_upset")], confidence="low", blockers=("fever or systemic upset requires upper-tract/complicated-infection assessment",)), trace, "lower-uti-systemic-ambiguity")
+                elif recurrent or male_without_prostate_workup or sex_conflict or not p(store, "female"):
                     missing = ("structural-cause assessment for recurrent infection",) if recurrent else ("assessment for prostatic involvement",)
-                    blockers = ("recurrent infection requires structural assessment before a simple lower-tract assignment",) if recurrent else ("male lower-tract symptoms require assessment for prostatic involvement",)
+                    if sex_conflict or not p(store, "female"):
+                        missing = ("confirmation that the patient is a non-pregnant adult woman",)
+                        blockers = ("the uncomplicated lower-tract rule is limited to a non-pregnant adult woman",)
+                    else:
+                        blockers = ("recurrent infection requires structural assessment before a simple lower-tract assignment",) if recurrent else ("male lower-tract symptoms require assessment for prostatic involvement",)
                     self._add(results, self._candidate(store, ("Acute cystitis",), ("Lower urinary tract infection",), .55, "lower-tract symptoms require additional recurrent/male-pathway discrimination", [f(store, "dysuria"), f(store, "urinary_frequency", "urinary_urgency")], confidence="low", missing=missing, blockers=blockers), trace, "lower-uti-needs-workup")
                 else:
-                    missing = ("adult sex and whether this is recurrent or complicated",) if not p(store, "female", "male") else ()
-                    self._add(results, self._candidate(store, ("Acute cystitis",), ("Lower urinary tract infection",), .84, "dysuria with frequency or urgency and no upper-tract/systemic feature", [f(store, "dysuria"), f(store, "urinary_frequency", "urinary_urgency")], missing=missing), trace, "lower-uti")
+                    self._add(results, self._candidate(store, ("Acute cystitis",), ("Lower urinary tract infection",), .84, "dysuria with frequency or urgency and no upper-tract/systemic feature in a female patient", [f(store, "dysuria"), f(store, "urinary_frequency", "urinary_urgency"), f(store, "female")]), trace, "lower-uti")
 
         dka_features_present = sum(p(store, item) for item in ("hyperglycaemia", "ketones", "acidosis"))
         hhs_features_present = p(store, "hyperglycaemia") and p(store, "raised_osmolality") and p(store, "altered_mentation")
-        if (p(store, "diabetes") or p(store, "type1_diabetes") or p(store, "type2_diabetes")) and not (dka_features_present >= 2 or hhs_features_present):
+        if (p(store, "diabetes") or p(store, "type1_diabetes") or p(store, "type2_diabetes")) and not (dka_features_present == 3 or hhs_features_present):
             if p(store, "type1_diabetes"):
                 self._add(results, self._candidate(store, ("Type 1 diabetes",), ("Diabetes type attribution",), .94, "diabetes type is explicitly stated as type 1", [f(store, "type1_diabetes")]), trace, "type-1-diabetes")
-            elif p(store, "type2_diabetes") or (p(store, "oral_agents") and p(store, "adult")):
+            elif p(store, "type2_diabetes") or (p(store, "oral_agents") and (p(store, "adult") or self._at_least(store, "age_years", 18))):
                 self._add(results, self._candidate(store, ("Type 2 diabetes",), ("Diabetes type attribution",), .90, "type 2 is documented or diabetes is managed on oral agents in an adult", [f(store, "type2_diabetes", "diabetes"), f(store, "oral_agents")]), trace, "type-2-diabetes")
 
         if p(store, "diarrhoea") and not p(store, "blood_stool", "pathogen"):
@@ -427,7 +439,7 @@ class CodingPolicy:
             else:
                 self._add(results, self._candidate(store, ("Malaria without parasitological confirmation",), ("Parasitological confirmation",), .55, "malaria is mentioned but neither a positive test nor clinical endemic-setting basis is recorded", [f(store, "malaria")], confidence="low", blockers=("test result or documented endemic-setting clinical treatment is missing",), missing=("malaria film/RDT and epidemiological context",)), trace, "malaria-uncertain")
 
-        dengue_pattern = p(store, "fever") and p(store, "myalgia") and p(store, "retroorbital_pain") and p(store, "rash") and p(store, "thrombocytopenia")
+        dengue_pattern = p(store, "fever") and p(store, "myalgia") and p(store, "retroorbital_pain") and p(store, "rash") and p(store, "thrombocytopenia") and p(store, "endemic_area")
         if p(store, "dengue") or dengue_pattern:
             severe_dengue = p(store, "warning_sign", "organ_dysfunction")
             if not p(store, "dengue_test"):
@@ -435,12 +447,15 @@ class CodingPolicy:
             elif dengue_pattern or p(store, "dengue"):
                 self._add(results, self._candidate(store, ("Severe dengue",) if severe_dengue else ("Dengue fever",), ("Arboviral febrile illness",), .92, "confirmed dengue presentation" + (" with warning features" if severe_dengue else ""), [f(store, "dengue", "fever"), f(store, "dengue_test"), f(store, "warning_sign", "organ_dysfunction")], flags=("urgent_review",) if severe_dengue else ()), trace, "dengue-confirmed")
 
-        septic_joint = p(store, "joint_swelling") and p(store, "fever") and p(store, "aspiration") and p(store, "synovial_culture", "synovial_microscopy")
-        if septic_joint:
-            self._add(results, self._candidate(store, ("Septic arthritis",), ("Crystal arthropathy",), .88, "febrile acutely swollen joint with synovial testing documented", [f(store, "joint_swelling"), f(store, "fever"), f(store, "aspiration"), f(store, "synovial_culture", "synovial_microscopy")], missing=("aspirate result",)), trace, "septic-arthritis")
-        elif p(store, "first_mtp",) and p(store, "joint_swelling", "joint_erythema") and p(store, "exquisite_tenderness") and not p(store, "fever", "systemic_upset"):
+        septic_joint = p(store, "joint_swelling") and p(store, "fever")
+        synovial_result = p(store, "synovial_culture", "synovial_microscopy")
+        if septic_joint and p(store, "aspiration") and synovial_result:
+            self._add(results, self._candidate(store, ("Septic arthritis",), ("Crystal arthropathy",), .88, "febrile acutely swollen joint with synovial testing and a recorded result", [f(store, "joint_swelling"), f(store, "fever"), f(store, "aspiration"), f(store, "synovial_culture", "synovial_microscopy")]), trace, "septic-arthritis")
+        elif septic_joint and (p(store, "aspiration") or synovial_result):
+            self._add(results, self._candidate(store, ("Septic arthritis",), ("Crystal arthropathy",), .56, "fever and an acutely swollen joint require synovial results before a septic or crystal assignment", [f(store, "joint_swelling"), f(store, "fever"), f(store, "aspiration"), f(store, "synovial_culture", "synovial_microscopy")], confidence="low", blockers=("synovial microscopy/culture result is pending or not documented",), missing=("definitive synovial fluid result",)), trace, "septic-joint-pending")
+        elif p(store, "first_mtp") and p(store, "joint_swelling", "joint_erythema") and p(store, "exquisite_tenderness") and not p(store, "other_joint_site") and not p(store, "fever", "systemic_upset"):
             self._add(results, self._candidate(store, ("Gout",), ("Crystal arthropathy",), .87, "classic first-MTP inflammatory presentation without systemic features", [f(store, "first_mtp"), f(store, "joint_swelling", "joint_erythema"), f(store, "exquisite_tenderness")]), trace, "gout")
-        elif p(store, "first_mtp", "joint_swelling") and p(store, "fever"):
+        elif p(store, "first_mtp") and p(store, "joint_swelling") and p(store, "fever"):
             self._add(results, self._candidate(store, ("Gout",), ("Crystal arthropathy",), .58, "first-MTP swelling with fever is not safely distinguishable from septic arthritis", [f(store, "first_mtp"), f(store, "joint_swelling"), f(store, "fever")], confidence="low", blockers=("synovial microscopy and culture result required to distinguish crystal disease from septic arthritis",), missing=("aspiration result",), flags=("do_not_treat_classic_pattern_as_proof",)), trace, "gout-septic-ambiguity")
 
         if p(store, "hip_pain"):
@@ -450,7 +465,7 @@ class CodingPolicy:
                     self._add(results, self._candidate(store, ("Septic arthritis",), ("Atraumatic painful hip",), .86, "acutely painful hip in an older child/adult with fever and raised inflammatory markers; aspiration documented", [f(store, "hip_pain"), f(store, "age_years"), f(store, "fever"), f(store, "inflammatory_markers"), f(store, "aspiration")], flags=("aspiration_before_antibiotics",)), trace, "septic-hip")
                 else:
                     self._add(results, self._candidate(store, ("Septic arthritis",), ("Atraumatic painful hip",), .57, "painful hip meets the septic-arthritis work-up pattern but aspiration is not recorded", [f(store, "hip_pain"), f(store, "fever"), f(store, "inflammatory_markers")], confidence="low", blockers=("hip aspiration result is required before definitive assignment",), missing=("joint aspiration and culture",), flags=("urgent_review",)), trace, "septic-hip-pending")
-            elif hip_age is not None and hip_age < 16 and p(store, "recent_viral_illness", "systemically_well") and p(store, "weight_bearing"):
+            elif hip_age is not None and hip_age < 10 and p(store, "recent_viral_illness", "systemically_well") and p(store, "weight_bearing"):
                 self._add(results, self._candidate(store, ("Transient synovitis of hip",), ("Atraumatic painful hip",), .86, "child with atraumatic hip pain after viral illness who is systemically well and weight-bearing", [f(store, "hip_pain"), f(store, "age_years"), f(store, "recent_viral_illness", "systemically_well"), f(store, "weight_bearing")]), trace, "transient-synovitis")
             else:
                 self._add(results, self._candidate(store, ("Septic arthritis",), ("Atraumatic painful hip",), .52, "atraumatic hip pain is not safely classifiable from the documented findings", [f(store, "hip_pain")], confidence="low", blockers=("age, systemic state, inflammatory markers and ability to bear weight are unresolved",), missing=("age, fever, inflammatory markers and weight-bearing status")), trace, "hip-uncertain")
@@ -482,7 +497,7 @@ class CodingPolicy:
         known_asthma = self._historical(store, "asthma")
         if known_asthma and p(store, "wheeze") and p(store, "bronchodilator_response"):
             self._add(results, self._candidate(store, ("Acute asthma exacerbation",), ("Reversible and fixed airway obstruction",), .90, "established asthma with acute reversible obstruction", [f(store, "asthma"), f(store, "wheeze"), f(store, "bronchodilator_response")]), trace, "asthma-exacerbation")
-        if p(store, "wheeze", "breathlessness") and self._at_least(store, "age_years", 40) and p(store, "smoking") and p(store, "fixed_obstruction"):
+        if p(store, "wheeze", "breathlessness") and self._at_least(store, "age_years", 40.01) and p(store, "smoking") and p(store, "fixed_obstruction"):
             self._add(results, self._candidate(store, ("COPD with acute exacerbation",), ("Reversible and fixed airway obstruction",), .89, "first adult wheeze/breathlessness presentation with smoking history and fixed obstruction", [f(store, "wheeze", "breathlessness"), f(store, "age_years"), f(store, "smoking"), f(store, "fixed_obstruction")]), trace, "fixed-airway-obstruction")
         if p(store, "wheeze") and p(store, "heart_failure_sign"):
             self._add(results, self._candidate(store, ("Acute decompensated heart failure",), ("Adult wheeze and the cardiac differential",), .88, "wheeze with pulmonary-congestion signs", [f(store, "wheeze"), f(store, "heart_failure_sign")]), trace, "cardiac-wheeze")
@@ -494,7 +509,14 @@ class CodingPolicy:
         elif hhs:
             self._add(results, self._candidate(store, ("Hyperosmolar hyperglycaemic state",), ("Diabetic ketoacidosis",), .92, "marked hyperglycaemia with raised osmolality and altered mentation without significant ketones", [f(store, "hyperglycaemia"), f(store, "raised_osmolality"), f(store, "altered_mentation")]), trace, "hhs")
         elif sum(p(store, item) for item in ("hyperglycaemia", "ketones", "acidosis")) >= 2:
-            self._add(results, self._candidate(store, ("Type 2 diabetes",), ("Diabetic ketoacidosis",), .55, "two DKA features support diabetes but do not establish the crisis triad", [f(store, item) for item in ("hyperglycaemia", "ketones", "acidosis") if f(store, item)], confidence="low", blockers=("third DKA criterion is missing",), missing=("complete glucose, ketone and acid-base results",)), trace, "partial-dka")
+            partial_facts = [f(store, item) for item in ("hyperglycaemia", "ketones", "acidosis") if f(store, item)]
+            if p(store, "type1_diabetes"):
+                self._add(results, self._candidate(store, ("Type 1 diabetes",), ("Diabetic ketoacidosis",), .74, "two DKA features support the documented underlying type but do not establish the crisis triad", partial_facts, confidence="moderate", missing=("complete glucose, ketone and acid-base results",), flags=("possible_diabetic_emergency",), provisional=True), trace, "partial-dka-type-1")
+            elif p(store, "type2_diabetes") or (p(store, "oral_agents") and (p(store, "adult") or self._at_least(store, "age_years", 18))):
+                self._add(results, self._candidate(store, ("Type 2 diabetes",), ("Diabetic ketoacidosis",), .74, "two DKA features support the documented underlying type but do not establish the crisis triad", partial_facts, confidence="moderate", missing=("complete glucose, ketone and acid-base results",), flags=("possible_diabetic_emergency",), provisional=True), trace, "partial-dka-type-2")
+            else:
+                store.warnings.append("two DKA features are present but the diabetes type is unresolved")
+                trace.append("partial-dka-type-missing")
 
         # A pathogenic gastroenteritis entry is selected only when the organism
         # is actually named and present in the catalogue.
@@ -503,15 +525,18 @@ class CodingPolicy:
 
         # Age- and context-qualified branches.
         if p(store, "convulsion") and p(store, "fever"):
-            in_band = self._number(store, "age_years") is not None and 0.5 <= self._number(store, "age_years") <= 5
+            seizure_age = self._number(store, "age_years")
+            in_band = seizure_age is not None and 0.5 <= seizure_age <= 5
             if in_band and not p(store, "cns_infection", "prior_afebrile_seizure"):
                 self._add(results, self._candidate(store, ("Febrile seizure",), ("Convulsion with fever",), .91, "fever-associated convulsion in the six-month-to-five-year band without CNS infection or prior afebrile seizure", [f(store, "convulsion"), f(store, "fever"), f(store, "age_years")]), trace, "febrile-seizure")
+            elif seizure_age is None:
+                self._add(results, self._candidate(store, ("Seizure, unspecified",), ("Convulsion with fever",), .54, "febrile convulsion cannot be placed in the age-qualified entry because age is missing", [f(store, "convulsion"), f(store, "fever")], confidence="low", blockers=("age is required to apply the six-month-to-five-year febrile-seizure definition",), missing=("patient age",), flags=("investigate-underlying-cause",)), trace, "febrile-seizure-age-missing")
             elif not in_band:
                 self._add(results, self._candidate(store, ("Seizure, unspecified",), ("Convulsion with fever",), .73, "febrile convulsion outside the febrile-seizure age band", [f(store, "convulsion"), f(store, "fever")], missing=("underlying cause of seizure",), flags=("investigate-underlying-cause",)), trace, "out-of-band-seizure")
 
         headache_days = self._at_least(store, "headache_days_per_month", 15)
         medication_days = self._at_least(store, "medication_days_per_month", 10)
-        months = self._at_least(store, "duration_months", 3)
+        months = self._at_least(store, "duration_months", 3.01)
         if p(store, "headache") and p(store, "medication_overuse") and headache_days and medication_days and months:
             self._add(results, self._candidate(store, ("Medication-overuse headache",), ("Medication-overuse headache",), .94, "headache and medication-use frequency thresholds sustained for more than three months", [f(store, "headache"), f(store, "medication_overuse"), f(store, "headache_days_per_month"), f(store, "medication_days_per_month"), f(store, "duration_months")]), trace, "medication-overuse-headache")
 
@@ -527,7 +552,7 @@ class CodingPolicy:
 
         if p(store, "pregnancy") and p(store, "hypertension"):
             after20 = self._at_least(store, "gestational_weeks", 20.01)
-            severe = self._at_least(store, "systolic_bp", 160) or self._at_most(store, "platelets", 99.99) or p(store, "pulmonary_oedema")
+            severe = self._at_least(store, "systolic_bp", 160) or self._at_most(store, "platelets", 99.99) or p(store, "pulmonary_oedema", "liver_dysfunction")
             preeclampsia = after20 and (p(store, "proteinuria", "headache", "visual_disturbance", "ruq_pain", "hyperreflexia") or p(store, "falling_platelets"))
             if preeclampsia:
                 terms = ("Severe pre-eclampsia",) if severe else ("Pre-eclampsia",)
@@ -539,27 +564,29 @@ class CodingPolicy:
 
         # Scrotal, biliary, back, skin, anaemia and injury pathways.
         if p(store, "scrotal_pain") and p(store, "unilateral"):
-            if self._at_most(store, "duration_hours", 6) and p(store, "high_riding_testis", "absent_cremasteric"):
+            scrotal_age = self._number(store, "age_years")
+            age_compatible = scrotal_age is None or scrotal_age <= 30
+            if self._at_most(store, "duration_hours", 6) and age_compatible and p(store, "high_riding_testis") and p(store, "absent_cremasteric"):
                 self._add(results, self._candidate(store, ("Testicular torsion",), ("Acutely painful scrotum",), .96, "acute unilateral scrotal pain with torsion examination findings", [f(store, "scrotal_pain"), f(store, "unilateral"), f(store, "duration_hours"), f(store, "high_riding_testis", "absent_cremasteric")], flags=("urgent_review",)), trace, "testicular-torsion")
-            elif p(store, "fever", "dysuria") and self._at_least(store, "duration_days", 1):
+            elif age_compatible and p(store, "fever", "dysuria") and self._at_least(store, "duration_days", 1) and p(store, "elevation_relief"):
                 self._add(results, self._candidate(store, ("Epididymo-orchitis",), ("Acutely painful scrotum",), .84, "gradual scrotal pain over days with fever or dysuria", [f(store, "scrotal_pain"), f(store, "duration_days"), f(store, "fever", "dysuria")]), trace, "epididymo-orchitis")
             else:
-                self._add(results, self._candidate(store, ("Testicular torsion",), ("Acutely painful scrotum",), .55, "acute unilateral scrotal pain requires urgent torsion discrimination", [f(store, "scrotal_pain"), f(store, "unilateral")], confidence="low", blockers=("onset duration and testicular position/cremasteric reflex are missing",), flags=("urgent_review",)), trace, "scrotal-uncertain")
+                self._add(results, self._candidate(store, ("Testicular torsion",), ("Acutely painful scrotum",), .55, "acute unilateral scrotal pain requires urgent torsion discrimination", [f(store, "scrotal_pain"), f(store, "unilateral")], confidence="low", blockers=("onset duration, age and testicular position/cremasteric reflex are insufficient for a safe assignment",), flags=("urgent_review",)), trace, "scrotal-uncertain")
 
         if p(store, "ruq_pain") and p(store, "fatty_meal"):
             if p(store, "jaundice") and p(store, "rigors"):
                 terms = ("Cholangitis",)
                 name = "cholangitis"
-            elif self._at_least(store, "duration_hours", 6) and p(store, "fever"):
+            elif self._at_least(store, "duration_hours", 6) and p(store, "fever") and p(store, "arrest_inspiration"):
                 terms = ("Acute cholecystitis",)
                 name = "acute-cholecystitis"
-            elif not p(store, "fever"):
+            elif not p(store, "fever") and p(store, "biliary_settling"):
                 terms = ("Cholelithiasis",)
                 name = "biliary-colic"
             else:
                 terms = ("Cholelithiasis",)
                 name = "biliary-uncertain"
-            self._add(results, self._candidate(store, terms, ("Right upper quadrant pain",), .92 if name != "biliary-uncertain" else .56, "right-upper-quadrant pain pattern" + (" with jaundice and rigors" if name == "cholangitis" else ""), [f(store, "ruq_pain"), f(store, "fatty_meal"), f(store, "jaundice", "rigors", "fever")], confidence="low" if name == "biliary-uncertain" else "high", blockers=("duration and infection features are insufficient to distinguish biliary diagnoses",) if name == "biliary-uncertain" else (), flags=("biliary_emergency",) if name == "cholangitis" else ()), trace, name)
+            self._add(results, self._candidate(store, terms, ("Right upper quadrant pain",), .92 if name != "biliary-uncertain" else .56, "right-upper-quadrant pain pattern" + (" with jaundice and rigors" if name == "cholangitis" else ""), [f(store, "ruq_pain"), f(store, "fatty_meal"), f(store, "biliary_settling", "arrest_inspiration", "jaundice", "rigors", "fever")], confidence="low" if name == "biliary-uncertain" else "high", blockers=("duration, settling and infection/examination features are insufficient to distinguish biliary diagnoses",) if name == "biliary-uncertain" else (), flags=("biliary_emergency",) if name == "cholangitis" else ()), trace, name)
 
         if p(store, "low_back_pain"):
             if p(store, "saddle_anaesthesia", "bladder_bowel_disturbance", "bilateral_leg", "progressive_weakness"):
@@ -569,20 +596,21 @@ class CodingPolicy:
             elif self._at_most(store, "age_years", 49) and not p(store, "focal_deficit", "fever", "weight_loss"):
                 self._add(results, self._candidate(store, ("Low back pain",), ("Lower back pain and its red flags",), .82, "adult under fifty with mechanical low back pain and no documented red flag", [f(store, "low_back_pain"), f(store, "age_years")]), trace, "mechanical-back-pain")
 
-        if p(store, "spreading_erythema") and p(store, "skin_warmth"):
+        if p(store, "spreading_erythema") and p(store, "skin_warmth") and not p(store, "pain_disproportionate", "rapid_progression", "skin_anaesthesia", "crepitus", "systemic_toxicity"):
             self._add(results, self._candidate(store, ("Bacterial skin infection",), ("Cellulitis",), .86, "spreading erythema and warm skin with an advancing edge", [f(store, "spreading_erythema"), f(store, "skin_warmth")]), trace, "cellulitis")
 
         hb = self._number(store, "haemoglobin_value")
         gestation = self._number(store, "gestational_weeks")
         if p(store, "pregnancy") and hb is not None:
-            threshold = 10.5 if gestation is not None and 13 <= gestation <= 27 else 11.0
-            if hb < threshold:
-                self._add(results, self._candidate(store, ("Anaemia complicating pregnancy",), ("Anaemia in pregnancy",), .89, "haemoglobin below the pregnancy threshold", [f(store, "pregnancy"), f(store, "haemoglobin_value"), f(store, "gestational_weeks")]), trace, "anaemia-in-pregnancy")
-            elif gestation is None and hb < 11:
+            if gestation is None and 10.5 <= hb < 11:
                 self._add(results, self._candidate(store, ("Anaemia complicating pregnancy",), ("Anaemia in pregnancy",), .53, "haemoglobin is in the trimester-dependent borderline range", [f(store, "pregnancy"), f(store, "haemoglobin_value")], confidence="low", blockers=("gestational age is required to apply the 10.5 versus 11 g/dL threshold",)), trace, "anaemia-trimester-uncertain")
+            elif hb < (10.5 if gestation is not None and 13 <= gestation <= 27 else 11.0):
+                self._add(results, self._candidate(store, ("Anaemia complicating pregnancy",), ("Anaemia in pregnancy",), .89, "haemoglobin below the pregnancy threshold", [f(store, "pregnancy"), f(store, "haemoglobin_value"), f(store, "gestational_weeks")]), trace, "anaemia-in-pregnancy")
 
         if p(store, "head_injury"):
-            if p(store, "loss_awareness") and (self._at_most(store, "loss_awareness_seconds", 60) or p(store, "brief_loss")) and not p(store, "vomiting", "repeated_vomiting", "focal_deficit", "convulsion", "anticoagulant") and p(store, "normal_neurology"):
+            loss_seconds = self._number(store, "loss_awareness_seconds")
+            brief_loss = (loss_seconds is None and p(store, "brief_loss")) or (loss_seconds is not None and loss_seconds < 60)
+            if p(store, "loss_awareness") and brief_loss and not p(store, "vomiting", "repeated_vomiting", "focal_deficit", "convulsion", "anticoagulant") and p(store, "normal_neurology"):
                 self._add(results, self._candidate(store, ("Concussion",), ("Head injury",), .87, "head injury with brief loss of awareness, normal examination and no vomiting", [f(store, "head_injury"), f(store, "loss_awareness"), f(store, "normal_neurology")]), trace, "concussion")
 
         if p(store, "cough") and (self._at_least(store, "duration_days", 14) or self._at_least(store, "duration_weeks", 2) or p(store, "haemoptysis", "night_sweats", "weight_loss", "tb_contact", "tb")):
@@ -615,18 +643,17 @@ class CodingPolicy:
         return results
 
     def _pathogen_candidate(self, store: FactStore, trace: list[str]) -> Candidate | None:
-        text = store.normalized
         organisms = (
-            ("escherichia coli", ("Escherichia coli enteritis",), ("e coli", "escherichia coli")),
-            ("salmonella", ("Salmonella enteritis",), ("salmonella",)),
-            ("shigella", ("Shigellosis",), ("shigella",)),
-            ("campylobacter", ("Campylobacter enteritis",), ("campylobacter",)),
-            ("cholera", ("Cholera",), ("cholera",)),
-            ("entamoeba", ("Amoebiasis",), ("entamoeba",)),
-            ("giardia", ("Giardiasis",), ("giardia",)),
+            ("escherichia coli", "organism_escherichia_coli", ("Escherichia coli enteritis",)),
+            ("salmonella", "organism_salmonella", ("Salmonella enteritis",)),
+            ("shigella", "organism_shigella", ("Shigellosis",)),
+            ("campylobacter", "organism_campylobacter", ("Campylobacter enteritis",)),
+            ("cholera", "organism_cholera", ("Cholera",)),
+            ("entamoeba", "organism_entamoeba", ("Amoebiasis",)),
+            ("giardia", "organism_giardia", ("Giardiasis",)),
         )
-        for label, code_terms, mentions in organisms:
-            if any(re.search(rf"(?<!\w){re.escape(mention)}(?!\w)", text) for mention in mentions):
+        for label, concept, code_terms in organisms:
+            if self._pos(store, "pathogen") and self._pos(store, concept):
                 fact = self._fact(store, "pathogen")
                 candidate = self._candidate(store, code_terms, ("Specificity of assignment",), .88, f"{label} is documented as the causative organism for gastroenteritis", [fact] if fact else (), confidence="high")
                 return candidate
@@ -665,8 +692,15 @@ class CodingPolicy:
                     continue
                 found = re.search(rf"(?<!\w){re.escape(term.casefold())}(?!\w)", text)
                 if found:
-                    before = text[max(0, found.start() - 150):found.start()]
-                    if re.search(assessment_markers, before) and not re.search(r"\b(?:rule out|query|possible|family history|no evidence of|denies)\b", before[-90:]):
+                    # Bind the documentation marker to the same sentence or
+                    # an immediately adjacent section-header line. A marker
+                    # many sentences earlier must not turn an incidental
+                    # symptom into an explicit diagnosis.
+                    boundary = max(text.rfind(mark, 0, found.start()) for mark in ".!?\n") + 1
+                    before = text[boundary:found.start()]
+                    prior_line = text[max(0, text.rfind("\n", 0, boundary - 1)):boundary]
+                    context = f"{prior_line} {before}"
+                    if re.search(assessment_markers, context) and not re.search(r"\b(?:rule out|query|possible|family history|no evidence of|denies)\b", before[-90:]):
                         match = found
                         break
             if match is None:

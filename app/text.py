@@ -38,6 +38,7 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
     "opacified_tm": ("opacified tympanic membrane", "opaque tympanic membrane", "cloudy eardrum"),
     "perforated_tm": ("perforated tympanic membrane", "perforated eardrum", "ear drum perforation"),
     "ear_discharge": ("ear discharge", "otorrhoea", "otorrhea", "discharge from the ear"),
+    "acute_onset": ("acute onset", "rapid onset", "rapid-onset", "sudden onset", "acute"),
     "unilateral": ("unilateral", "one-sided", "on one side"),
     "pulsating": ("pulsating", "throbbing", "throbbing headache"),
     "moderate_severe": ("moderate to severe", "moderate-severe", "severe intensity", "severe headache"),
@@ -66,7 +67,8 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
     "vomiting": ("vomiting", "vomited", "emesis", "throwing up"),
     "blood_stool": ("blood in stool", "bloody stool", "haematochezia", "hematochezia", "melena", "melaena"),
     "pathogen": ("pathogen", "organism isolated", "culture grew", "stool culture", "positive culture"),
-    "first_mtp": ("first metatarsophalangeal", "first mcp joint", "big toe joint", "great toe joint"),
+    "first_mtp": ("first metatarsophalangeal", "first mtp", "1st mtp", "first mcp joint", "big toe joint", "great toe joint"),
+    "other_joint_site": ("ankle", "knee", "wrist", "elbow", "shoulder", "midfoot"),
     "joint_swelling": ("joint swelling", "swollen joint", "acutely swollen joint", "joint became suddenly swollen", "swelling", "swollen"),
     "joint_erythema": ("joint erythema", "red joint", "erythematous joint", "joint became red", "joint became suddenly swollen, red", "redness of the joint", "erythema"),
     "exquisite_tenderness": ("exquisite tenderness", "exquisitely tender", "tender to light touch"),
@@ -74,7 +76,7 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
     "recent_instrumentation": ("recent instrumentation", "instrumentation", "recent procedure"),
     "aspiration": ("aspiration", "aspirated", "joint aspirate"),
     "synovial_microscopy": ("synovial fluid microscopy", "crystals on microscopy", "crystal microscopy"),
-    "synovial_culture": ("synovial fluid culture", "joint fluid culture", "culture of aspirate"),
+    "synovial_culture": ("synovial fluid culture", "joint fluid culture", "culture of aspirate", "synovial culture grew", "culture grew bacteria", "positive synovial culture"),
     "jaw_claudication": ("jaw claudication", "jaw pain on chewing", "jaw discomfort on chewing"),
     "scalp_tenderness": ("scalp tenderness", "tender scalp"),
     "visual_disturbance": ("visual disturbance", "visual loss", "blurred vision", "vision changes"),
@@ -121,7 +123,7 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
     "convulsion": ("convulsion", "seizure", "fit", "fitting"),
     "prior_afebrile_seizure": ("prior afebrile seizure", "previous seizure without fever", "history of afebrile seizure"),
     "cns_infection": ("central nervous system infection", "meningitis", "encephalitis"),
-    "medication_overuse": ("regular symptomatic medication", "analgesics on", "painkillers on", "acetaminophen", "paracetamol", "medication overuse", "medication-overuse"),
+    "medication_overuse": ("regular symptomatic medication", "analgesics on", "painkillers on", "acetaminophen", "paracetamol", "ibuprofen", "naproxen", "aspirin", "pain medication", "medication overuse", "medication-overuse"),
     "bleeding_early_pregnancy": ("bleeding in early pregnancy", "first trimester bleeding", "vaginal bleeding in pregnancy", "vaginal bleeding"),
     "closed_os": ("closed cervical os", "cervix closed"),
     "viable_iup": ("viable intrauterine pregnancy", "viable intrauterine gestation", "live intrauterine pregnancy"),
@@ -210,6 +212,19 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
     "headache_days_per_month": ("headache days per month", "headache on days per month"),
     "medication_days_per_month": ("medication days per month", "analgesics on days per month", "painkillers on days per month"),
     "dengue_test": ("dengue test", "dengue pcr", "ns1", "dengue serology", "positive dengue test"),
+    "arrest_inspiration": ("arrest of inspiration", "inspiratory arrest", "murphy sign positive", "positive murphy sign", "murphy's sign"),
+    "biliary_settling": ("settles within hours", "settled within hours", "resolves within hours", "resolved within hours", "subsides within hours", "subsided within hours"),
+    "elevation_relief": ("relief on elevation", "pain relieved by elevation", "relieved by elevation", "elevating the testis relieves", "prehn sign positive"),
+    "systemic_toxicity": ("systemic toxicity", "toxic appearance", "toxic-appearing", "looks toxic"),
+    "intracranial_warning": ("deterioration in conscious level", "deteriorating conscious level", "declining conscious level", "lucid interval followed by decline", "lucid interval then decline"),
+    "liver_dysfunction": ("deranged transaminases", "elevated transaminases", "raised liver enzymes", "abnormal liver enzymes"),
+    "organism_escherichia_coli": ("escherichia coli", "e. coli", "e coli"),
+    "organism_salmonella": ("salmonella",),
+    "organism_shigella": ("shigella",),
+    "organism_campylobacter": ("campylobacter",),
+    "organism_cholera": ("cholera",),
+    "organism_entamoeba": ("entamoeba",),
+    "organism_giardia": ("giardia",),
     "pain": ("pain",),
 }
 
@@ -274,7 +289,9 @@ def _sentence_bounds(text: str, start: int, end: int) -> tuple[int, int]:
     return left, right
 
 
-def _assertion(normalized: str, sentence_start: int, start: int) -> tuple[str, str, str]:
+def _assertion(normalized: str, sentence_start: int, start: int, end: int | None = None) -> tuple[str, str, str]:
+    if end is None:
+        end = start
     before = normalized[sentence_start:start]
     # A new comma/semicolon often starts a separate assertion scope, e.g.
     # "no fever, possible pneumonia". Keep the local clause primary while
@@ -283,6 +300,8 @@ def _assertion(normalized: str, sentence_start: int, start: int) -> tuple[str, s
     clause = re.split(r"[,;:]", before)[-1]
     compact = clause[-140:]
     wider = before[-140:]
+    sentence_end = _sentence_bounds(normalized, start, end)[1]
+    after = normalized[end:min(sentence_end, end + 80)]
     # Most specific scopes first.
     if re.search(r"\b(?:family history of|mother has|father has|sibling has|relative with)\s*$", compact):
         return "family_history", "current", "other"
@@ -299,6 +318,13 @@ def _assertion(normalized: str, sentence_start: int, start: int) -> tuple[str, s
     # Carry a leading "without" across a short comma-separated list.
     if re.search(r"\bwithout\b[^.!?\n]{0,90}$", wider) and not re.search(r"\b(?:but|however|although)\b", wider):
         return "absent", "current", "patient"
+    # Results often follow the finding: "RDT negative", "culture pending",
+    # or "organism not identified".  Looking only to the left would turn
+    # these into positive evidence and defeat confirmation requirements.
+    if re.match(r"\s*(?:is|was|were|remains|result(?: is)?|showed?)?\s*(?:negative|not detected|not identified|no growth|sterile|ruled out|absent|not present)\b", after):
+        return "absent", "current", "patient"
+    if re.match(r"\s*(?:is|was|were|remains|result(?: is)?\s*)?(?:pending|awaiting|not yet available|sent|ordered|requested)\b", after):
+        return "possible", "current", "patient"
     return "present", "current", "patient"
 
 
@@ -324,6 +350,7 @@ def _add_alias_facts(store: FactStore) -> None:
     # possible form of respiratory compromise.  Deduplicate only the same
     # concept/span pair.
     occupied: set[tuple[str, int, int]] = set()
+    spans_by_concept: dict[str, list[tuple[int, int]]] = {}
     for concept, aliases in CONCEPT_ALIASES.items():
         for alias in sorted(aliases, key=len, reverse=True):
             # '*' in an alias means a deliberately loose word boundary, e.g.
@@ -337,16 +364,25 @@ def _add_alias_facts(store: FactStore) -> None:
                 key = (concept, match.start(), match.end())
                 if key in occupied:
                     continue
+                if any(
+                    match.start() < prior_end and match.end() > prior_start
+                    for prior_start, prior_end in spans_by_concept.get(concept, ())
+                ):
+                    # Aliases such as "fatty food" and "after fatty food"
+                    # describe one mention. Preserve distinct occurrences,
+                    # but do not manufacture duplicate facts from overlap.
+                    continue
                 occupied.add(key)
+                spans_by_concept.setdefault(concept, []).append((match.start(), match.end()))
                 sentence_start, _ = _sentence_bounds(store.normalized, *span)
-                assertion, temporality, experiencer = _assertion(store.normalized, sentence_start, match.start())
+                assertion, temporality, experiencer = _assertion(store.normalized, sentence_start, match.start(), match.end())
                 confidence = "high" if alias in (concept.replace("_", " "),) else "moderate"
                 _add_fact(store, concept, True, match.start(), match.end(), assertion, temporality, experiencer, confidence)
 
 
 def _add_number_fact(store: FactStore, concept: str, value: float, start: int, end: int, unit: str | None = None) -> None:
     sentence_start, _ = _sentence_bounds(store.normalized, start, end)
-    assertion, temporality, experiencer = _assertion(store.normalized, sentence_start, start)
+    assertion, temporality, experiencer = _assertion(store.normalized, sentence_start, start, end)
     stored_value: Any = {"value": value, "unit": unit}
     _add_fact(store, concept, stored_value, start, end, assertion, temporality, experiencer, "high")
 
@@ -399,11 +435,11 @@ def _add_numeric_facts(store: FactStore) -> None:
                     high = value >= 11 if "mmol" in unit_text or not unit_text else value >= 200
                     if high:
                         sentence_start, _ = _sentence_bounds(text, match.start(), match.end())
-                        assertion, temporality, experiencer = _assertion(text, sentence_start, match.start())
+                        assertion, temporality, experiencer = _assertion(text, sentence_start, match.start(), match.end())
                         _add_fact(store, "hyperglycaemia", True, match.start(), match.end(), assertion, temporality, experiencer, "high")
                 if concept == "systolic_bp" and value >= 140:
                     sentence_start, _ = _sentence_bounds(text, match.start(), match.end())
-                    assertion, temporality, experiencer = _assertion(text, sentence_start, match.start())
+                    assertion, temporality, experiencer = _assertion(text, sentence_start, match.start(), match.end())
                     _add_fact(store, "hypertension", True, match.start(), match.end(), assertion, temporality, experiencer, "high")
 
 
@@ -423,7 +459,7 @@ def _add_context_facts(store: FactStore) -> None:
     for concept, pattern in context_patterns.items():
         for match in re.finditer(pattern, text):
             sentence_start, _ = _sentence_bounds(text, match.start(), match.end())
-            assertion, temporality, experiencer = _assertion(text, sentence_start, match.start())
+            assertion, temporality, experiencer = _assertion(text, sentence_start, match.start(), match.end())
             _add_fact(store, concept, True, match.start(), match.end(), assertion, temporality, experiencer, "moderate")
 
 
