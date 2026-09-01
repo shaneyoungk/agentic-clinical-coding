@@ -292,8 +292,9 @@ class CodingPolicy:
             code_terms = ("Septic shock",) if shock else ("Sepsis", "without septic shock")
             self._add(results, self._candidate(store, code_terms, ("Sepsis",), .98 if shock else .91, "documented or strongly suspected infection with organ dysfunction" + (" and persistent hypotension requiring vasopressors" if shock else ""), [f for f in facts if f], flags=("time_critical",),), trace, "septic-shock" if shock else "sepsis")
 
-        # The catalogue does not contain an acute-chest-syndrome entry; refusing
-        # to label this as an uncomplicated sickle crisis is safer.
+        # An acute-chest presentation must not be labelled as an uncomplicated
+        # sickle crisis. The supplied catalogue has no dedicated entry, but a
+        # separately validated addition may provide one.
         if self._historical(store, "sickle_cell") and self._pos(store, "acute_chest_sign", "fever", "chest_pain"):
             self._add(results, self._candidate(store, ("Sickle cell", "crisis"), ("Sickle cell",), .60, "sickle cell disease with possible acute chest syndrome", [self._fact(store, "sickle_cell"), self._fact(store, "acute_chest_sign", "fever", "chest_pain")], confidence="low", blockers=("acute chest syndrome is not represented by a dedicated catalogue entry",), missing=("oxygenation, chest imaging and clinician confirmation",), flags=("urgent_review", "do_not_substitute_uncomplicated_crisis")), trace, "sickle-acute-chest")
 
@@ -308,7 +309,32 @@ class CodingPolicy:
             self._add(results, self._candidate(store, ("Intracranial injury",), ("Head injury",), .96, "head injury with an intracranial-injury warning feature", [self._fact(store, "head_injury"), self._fact(store, "focal_deficit", "repeated_vomiting", "convulsion", "anticoagulant", "persistent_deficit")], flags=("imaging_required", "urgent_review")), trace, "intracranial-injury")
 
         if self._pos(store, "pain_disproportionate", "rapid_progression", "skin_anaesthesia", "crepitus"):
-            self._add(results, self._candidate(store, ("Bacterial skin infection",), ("Cellulitis",), .62, "soft-tissue red flags indicate a deeper necrotising process", [self._fact(store, "pain_disproportionate", "rapid_progression", "skin_anaesthesia", "crepitus")], confidence="low", blockers=("necrotising soft-tissue infection has no dedicated catalogue entry",), flags=("urgent_surgical_review",)), trace, "necrotising-soft-tissue-gap")
+            red_flag_facts = [self._fact(store, "pain_disproportionate", "rapid_progression", "skin_anaesthesia", "crepitus")]
+            if self._code("Necrotising fasciitis") is not None:
+                candidate = self._candidate(
+                    store,
+                    ("Necrotising fasciitis",),
+                    ("Cellulitis",),
+                    .93,
+                    "soft-tissue red flags support the separately sourced dedicated necrotising-fasciitis entry",
+                    red_flag_facts,
+                    flags=("urgent_surgical_review",),
+                )
+                rule_name = "necrotising-soft-tissue-added-code"
+            else:
+                candidate = self._candidate(
+                    store,
+                    ("Bacterial skin infection",),
+                    ("Cellulitis",),
+                    .62,
+                    "soft-tissue red flags indicate a deeper necrotising process",
+                    red_flag_facts,
+                    confidence="low",
+                    blockers=("necrotising soft-tissue infection has no dedicated catalogue entry",),
+                    flags=("urgent_surgical_review",),
+                )
+                rule_name = "necrotising-soft-tissue-gap"
+            self._add(results, candidate, trace, rule_name)
         return results
 
     # --- named guideline families -----------------------------------------------

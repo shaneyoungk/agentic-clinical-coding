@@ -1,0 +1,14 @@
+[
+  {
+    "code": "1B71",
+    "title": "Necrotising fasciitis",
+    "chapter": "Certain infectious or parasitic diseases",
+    "synonyms": [
+      "Necrotizing fasciitis",
+      "necrotising soft-tissue infection",
+      "necrotizing soft tissue infection"
+    ],
+    "code_system": "http://id.who.int/icd/release/11/mms",
+    "version": "2025-01"
+  }
+]

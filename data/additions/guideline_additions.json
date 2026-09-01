@@ -1,0 +1,11 @@
+[
+  {
+    "id": "EXT-WHO-MALARIA-001",
+    "title": "WHO diagnostic testing for suspected malaria",
+    "source": "WHO Global Malaria Programme: https://www.who.int/teams/global-malaria-programme/case-management/diagnosis",
+    "effective": "2026-01",
+    "status": "active",
+    "trust": "normal",
+    "text": "WHO recommends prompt diagnosis of suspected malaria by microscopy or rapid diagnostic test before treatment. Where quality-assured testing is available, antimalarial treatment is reserved for patients with a positive test; patients with a negative test should be assessed for other causes of fever."
+  }
+]
