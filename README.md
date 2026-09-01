@@ -16,10 +16,13 @@ python -m app.evaluate
 ```
 
 Input can be JSON, JSONL, or one plain-text note per line. Each assignment
-contains the catalogue code, guideline ID, quoted note evidence and confidence
-factors. `trace` records corpus hashes, retrieval hits, extracted facts and
-policy branches. No model key is required; an LLM adapter would be an optional
-future proposer whose output must pass the same policy and evidence checks.
+contains the catalogue code, code-system/version, guideline ID, quoted note
+evidence and confidence factors. The original `note_text` is retained in every
+result, so malformed, unsupported or only-partially-understood input is still
+auditable. `trace` records corpus hashes, retrieval hits, extracted facts,
+guideline lifecycle decisions and policy branches. No model key is required;
+an LLM adapter would be an optional future proposer whose output must pass the
+same policy and evidence checks.
 The output contract is documented in `schema/result.schema.json`.
 
 ## Repository map and execution flow
@@ -41,10 +44,11 @@ The important files are:
   field names (`text`, `note`, `note_text`, `consult_note`, `body`), assigns a
   stable fallback ID, and preserves malformed or blank records as explicit
   unresolved records so they cannot disappear silently.
-- `app/corpus.py` validates the catalogue and guideline JSON, rejects duplicate
-  or conflicting additions, computes SHA-256 provenance hashes, and applies
-  lifecycle rules. It excludes deprecated/untrusted guidance and applies the
-  newer pneumonia supersession relationship.
+- `app/corpus.py` validates the catalogue and guideline JSON, preserves
+  code-system/version metadata, rejects duplicate or conflicting additions,
+  computes SHA-256 provenance hashes, and applies lifecycle rules. It excludes
+  deprecated/untrusted guidance and applies the newer pneumonia supersession
+  relationship; the trace explains each inclusion/exclusion decision.
 - `app/models.py` contains the typed data objects shared by every layer:
   catalogue codes, guidelines, notes, extracted facts, evidence, candidates,
   problems and final coding results.
@@ -67,8 +71,10 @@ The important files are:
   code-set accuracy and record-accounting rate. It is a lightweight tbench-like
   regression command with no third-party dependencies.
 - `data/icd_catalog.json` and `data/guideline_snippets.json` are the supplied
-  source inputs. Keep separately sourced additions in separate files and pass
-  them with `--extra-catalogue` or `--extra-guidelines`.
+  source inputs. `data/additions/` contains the separately sourced WHO
+  necrotising-fasciitis code and malaria diagnostic guidance, with provenance
+  notes. They are opt-in and can be passed with `--extra-catalogue` or
+  `--extra-guidelines`, so the supplied-corpus benchmark remains unchanged.
 - `benchmark/notes.jsonl` contains readable local benchmark notes and
   `benchmark/expected.json` contains their expected code sets. These are
   development checks, not training data.
@@ -104,20 +110,21 @@ file in the container from PowerShell, use
 The data audit found 404 unique catalogue codes and 45 dated snippets, with no
 provided guideline-to-code map. The active pneumonia revision supersedes the
 older clinical-only rule; deprecated and unsigned/imported guidance is excluded
-from decision retrieval, while its exclusion is visible in the trace. The
+from decision retrieval, while every exclusion is explained in the trace. The
 imported chest-pain snippet contains a prompt-injection directive and is
 treated as untrusted data, not executable instruction. Definitions, negatives,
 age bands, time windows, confirmation requirements and competing candidates are
 implemented as predicates. Missing catalogue coverage (for example giant-cell
-arteritis, acute chest syndrome and necrotising soft-tissue infection) produces
-a coded refusal and safety flag.
+arteritis and acute chest syndrome) produces a coded refusal and safety flag.
 
-I reviewed public WHO ICD-11/API material and clinical safety/evaluation
-guidance, but did not copy external codes into the exercise catalogue: without
-the exercise's release/version and a validated local mapping, doing so could
-create a plausible but wrong payer assignment. The additive-loader and corpus
-hashes are ready for separately sourced, licensed additions; any addition
-should carry its own source, version and review record.
+I added `1B71 Necrotising fasciitis` as an opt-in catalogue extension after
+verifying the code/title in the WHO ICD-11 Reference Guide; the gap matters
+because the supplied cellulitis entry must not absorb a necrotising emergency.
+I also added a short, separately sourced paraphrase of WHO malaria diagnostic
+testing guidance. Both additions are documented in `data/additions/`, carry
+source/version metadata, are hashed at runtime and remain subject to the same
+policy checks. The default run intentionally preserves the supplied ontology;
+the additions are enabled explicitly with the CLI flags.
 
 The deterministic rules should generalise to paraphrased notes when the same
 clinical facts are documented. They are not a replacement for clinician/coder
