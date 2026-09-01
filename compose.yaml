@@ -1,0 +1,8 @@
+services:
+  coder:
+    build: .
+    command: ["examples/smoke_notes.jsonl"]
+    volumes:
+      - ./examples:/app/examples:ro
+      - ./data:/app/data:ro
+
