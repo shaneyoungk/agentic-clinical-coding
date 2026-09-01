@@ -80,6 +80,7 @@ class CodingPolicy:
 
         reasons = list(store.warnings)
         reasons.append("no catalogue entry satisfied a complete rule definition")
+        review_guideline = self._guideline("Assignment confidence and unresolved encounters")
         problem = ProblemResult(
             problem_id="problem-1",
             span=None,
@@ -87,7 +88,13 @@ class CodingPolicy:
             missing_information=self._missing_for_unresolved(store),
             unresolved_reasons=reasons,
             safety_flags=["do_not_force_fit_to_nearest_catalogue_entry"],
-            evidence_ledger=self._ledger(()),
+            evidence_ledger=[{
+                "code": None,
+                "guideline_id": review_guideline.id,
+                "support": "refusal path: no safe catalogue assignment was established",
+                "missing_information": self._missing_for_unresolved(store),
+                "blockers": reasons,
+            }],
         )
         return PolicyDecision((problem,), {"rules_fired": rule_trace, "active_guidelines": sorted(self._used_guidelines)})
 

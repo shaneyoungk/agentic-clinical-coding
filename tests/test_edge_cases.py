@@ -41,6 +41,7 @@ class EdgeCaseTests(unittest.TestCase):
         self.assertEqual(result["status"], "unresolved")
         self.assertEqual(result["assignments"], [])
         self.assertTrue(any("outside the supplied catalogue" in item for item in result["unresolved_reasons"]))
+        self.assertEqual(result["problems"][0]["evidence_ledger"][0]["guideline_id"], "GDL-040")
 
     def test_recurrent_and_incomplete_thresholds_do_not_force_fit(self) -> None:
         recurrent = self.result("Adult woman with dysuria, frequency and urgency; three episodes in twelve months, no fever.")
