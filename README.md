@@ -22,6 +22,74 @@ policy branches. No model key is required; an LLM adapter would be an optional
 future proposer whose output must pass the same policy and evidence checks.
 The output contract is documented in `schema/result.schema.json`.
 
+## Repository map and execution flow
+
+If you are new to the project, start with `app/cli.py`. The program follows
+this path:
+
+`CLI -> input parser -> corpus loader -> fact extraction -> retrieval -> policy
+rules -> JSONL result`
+
+The important files are:
+
+- `app/cli.py` is the command-line entry point. It accepts the input path,
+  optional corpus paths and output path, loads the engine, and writes one JSON
+  result per input note.
+- `app/__main__.py` makes `python -m app ...` an equivalent shorter entry
+  point. `python -m app.cli ...` is also supported.
+- `app/io.py` reads JSON, JSONL and plain-text input. It accepts common text
+  field names (`text`, `note`, `note_text`, `consult_note`, `body`), assigns a
+  stable fallback ID, and preserves malformed or blank records as explicit
+  unresolved records so they cannot disappear silently.
+- `app/corpus.py` validates the catalogue and guideline JSON, rejects duplicate
+  or conflicting additions, computes SHA-256 provenance hashes, and applies
+  lifecycle rules. It excludes deprecated/untrusted guidance and applies the
+  newer pneumonia supersession relationship.
+- `app/models.py` contains the typed data objects shared by every layer:
+  catalogue codes, guidelines, notes, extracted facts, evidence, candidates,
+  problems and final coding results.
+- `app/text.py` is the deterministic clinical fact extractor. It normalizes
+  spelling and punctuation, recognizes clinical aliases, numbers and units,
+  and marks facts as present, absent, possible, conditional, historical or
+  family history. It is deliberately a fact layer, not a code lookup table.
+- `app/retrieval.py` provides a small dependency-free lexical retriever over
+  catalogue titles/synonyms and active guidelines. Its hits are for relevance
+  and audit traceability; retrieval alone never assigns a diagnosis.
+- `app/policy.py` is the safety-critical decision layer. It checks definitions,
+  exclusions, age/time/measurement thresholds, confirmation requirements,
+  competing candidates and catalogue gaps. It creates evidence-backed
+  candidates or a refusal. It uses semantic catalogue titles and guideline
+  content rather than executing note text or trusting a guideline ID.
+- `app/engine.py` orchestrates one note through extraction, policy and
+  retrieval, then calculates overall status/confidence and assembles the full
+  trace (facts, evidence, corpus hashes and policy branches).
+- `app/evaluate.py` runs the local benchmark in `benchmark/` and reports exact
+  code-set accuracy and record-accounting rate. It is a lightweight tbench-like
+  regression command with no third-party dependencies.
+- `data/icd_catalog.json` and `data/guideline_snippets.json` are the supplied
+  source inputs. Keep separately sourced additions in separate files and pass
+  them with `--extra-catalogue` or `--extra-guidelines`.
+- `benchmark/notes.jsonl` contains readable local benchmark notes and
+  `benchmark/expected.json` contains their expected code sets. These are
+  development checks, not training data.
+- `tests/test_system.py` covers corpus loading, lifecycle, input accounting
+  and smoke assignments. `tests/test_edge_cases.py` covers negation/history
+  scope, prompt injection, missing catalogue conditions, incomplete
+  thresholds, provenance and malformed input. Run both with the command below.
+- `schema/result.schema.json` documents the versioned JSON output contract.
+- `Dockerfile` and `compose.yaml` provide the clean-clone container workflow;
+  `examples/smoke_notes.jsonl` is the default input for `docker compose up`.
+- `reasoning.md` is the candidate's private design record. It is intentionally
+  ignored by Git at the user's request and is not required at runtime.
+
+For a quick beginner walkthrough, run `python -m app.cli examples/smoke_notes.jsonl`.
+The first two records receive evidence-backed
+assignments; the third demonstrates an unresolved result. Open one JSON line
+and inspect `assignments` for proposed codes, `problems` for candidates and
+missing information, and `trace` for how the decision was made. Then run
+`python -m unittest discover -s tests -v` and `python -m app.evaluate` to
+verify the installation.
+
 `docker compose up` builds and runs the included smoke file. To run a supplied
 file in the container from PowerShell, use
 `docker compose run --rm -v "${PWD}:/input:ro" coder /input/notes.jsonl`.
