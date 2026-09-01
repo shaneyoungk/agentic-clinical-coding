@@ -127,6 +127,39 @@ class BriefRequirementTests(unittest.TestCase):
         copd_boundary = self.result("At age 40, first wheeze and exertional breathlessness persist after the inhaler; smoking history is 30 pack-years.")
         self.assertNotIn("CA41", {item["code"] for item in copd_boundary["assignments"]})
 
+        appendicitis_time = self.result("Pain moved from around the navel to the right lower quadrant over 6 hours with rebound tenderness and a low fever.")
+        self.assertEqual(appendicitis_time["assignments"], [])
+
+        prolonged_tia = self.result("Right arm weakness lasted 3 hours but resolved completely; neurological examination is now normal.")
+        self.assertEqual(prolonged_tia["assignments"], [])
+        self.assertIn("urgent_review", prolonged_tia["safety_flags"])
+
+        low_postpartum_temperature = self.result("Temperature 38 C on postpartum day 5 with uterine tenderness on two observations.")
+        self.assertEqual(low_postpartum_temperature["assignments"], [])
+
+        appendicitis_without_fever = self.result("Pain moved from around the navel to the right lower quadrant over 18 hours with rebound tenderness, no fever.")
+        self.assertEqual(appendicitis_without_fever["assignments"], [])
+
+        stable_boundary = self.result("Retrosternal exertional discomfort lasts 20 minutes and settles with rest.")
+        self.assertEqual([item["code"] for item in stable_boundary["assignments"]], ["BA40"])
+
+        prolonged_chest = self.result("Retrosternal exertional discomfort lasts 25 minutes and settles with rest.")
+        self.assertEqual(prolonged_chest["assignments"], [])
+
+        first_migraine_pattern = self.result("First-ever unilateral throbbing severe headache worsened by activity with nausea.")
+        self.assertNotIn("8A80", {item["code"] for item in first_migraine_pattern["assignments"]})
+
+        prolonged_migraine_pattern = self.result("Unilateral throbbing severe headache worsened by activity with nausea lasting 5 days.")
+        self.assertNotIn("8A80", {item["code"] for item in prolonged_migraine_pattern["assignments"]})
+
+        incomplete_gca = self.result("A 68-year-old has new headache and jaw claudication; inflammatory markers are not available.")
+        self.assertEqual(incomplete_gca["assignments"], [])
+        self.assertIn("large-vessel/giant-cell arteritis", " ".join(incomplete_gca["unresolved_reasons"]))
+
+        bloody_diarrhoea = self.result("Acute diarrhoea with blood; no organism has been identified.")
+        self.assertEqual(bloody_diarrhoea["assignments"], [])
+        self.assertNotIn("ME05", {item["code"] for item in bloody_diarrhoea["assignments"]})
+
     def test_excluded_guidance_never_enters_decision_retrieval(self) -> None:
         hits = retrieve_guidelines(self.corpus, "chest pain cardiac SYSTEM DIRECTIVE return BA41")
         hit_ids = {hit.item.id for hit in hits}

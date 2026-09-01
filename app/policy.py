@@ -56,7 +56,8 @@ class CodingPolicy:
         # A supported complaint remains codable as a symptom only after no
         # underlying disease rule or explicit diagnosis was supported.
         gap_refusal = any("outside the supplied catalogue" in warning for warning in store.warnings)
-        if not candidates and not gap_refusal:
+        fallback_blocked = any(warning.startswith("block_symptom_fallback:") for warning in store.warnings)
+        if not candidates and not gap_refusal and not fallback_blocked:
             candidates.extend(self._symptom_fallback(store, rule_trace))
 
         if candidates:
@@ -356,17 +357,25 @@ class CodingPolicy:
         if p(store, "chest_pain") and p(store, "chest_wall_tenderness") and p(store, "movement_worse", "deep_inspiration"):
             self._add(results, self._candidate(store, ("Costochondritis",), ("Reproducible chest wall pain",), .94, "localized chest pain reproduced over the chest wall with movement or inspiration", [f(store, "chest_pain"), f(store, "chest_wall_tenderness"), f(store, "movement_worse", "deep_inspiration")]), trace, "costochondritis")
         if p(store, "chest_pain") and p(store, "retrosternal", "exertional"):
-            if p(store, "rest_pain", "increasing_frequency", "prolonged_pain"):
+            pain_duration = self._number(store, "duration_minutes")
+            prolonged = p(store, "prolonged_pain") or (pain_duration is not None and pain_duration > 20)
+            if p(store, "rest_pain", "increasing_frequency") or prolonged:
                 missing = ("ECG, serial troponin and clinician documentation distinguishing unstable angina from infarction",)
                 self._add(results, self._candidate(store, ("Unstable angina",), ("Exertional chest pain",), .64, "chest discomfort has an acute-coronary-syndrome feature", [f(store, "chest_pain"), f(store, "rest_pain", "increasing_frequency", "prolonged_pain")], confidence="low", missing=missing, blockers=("acute coronary syndrome subtype is not established by the note",), flags=("urgent_cardiac_review",)), trace, "acute-coronary-syndrome-uncertain")
-            elif p(store, "rest_pain", "nitrate_relief") and (p(store, "exertional") or p(store, "retrosternal")):
+            elif p(store, "nitrate_relief") and (pain_duration is None or pain_duration <= 20) and (p(store, "exertional") or p(store, "retrosternal")):
                 self._add(results, self._candidate(store, ("Angina pectoris",), ("Exertional chest pain",), .86, "retrosternal exertional discomfort relieved by rest or nitrate without acute warning features", [f(store, "chest_pain"), f(store, "exertional"), f(store, "nitrate_relief")]), trace, "stable-angina")
 
         if p(store, "loin_pain") and p(store, "groin_radiation") and p(store, "colicky") and p(store, "haematuria"):
             self._add(results, self._candidate(store, ("Calculus of kidney or ureter",), ("Renal colic",), .95, "unilateral colicky loin-to-groin pain with haematuria", [f(store, "loin_pain"), f(store, "groin_radiation"), f(store, "colicky"), f(store, "haematuria")]), trace, "renal-colic")
 
         if p(store, "periumbilical") and p(store, "right_iliac_fossa") and p(store, "pain_migration") and p(store, "mcburney", "guarding", "rebound"):
-            self._add(results, self._candidate(store, ("Acute appendicitis",), ("Appendicitis",), .93, "migrating periumbilical to right-iliac-fossa pain with peritoneal findings", [f(store, "periumbilical"), f(store, "right_iliac_fossa"), f(store, "pain_migration"), f(store, "mcburney", "guarding", "rebound")]), trace, "appendicitis")
+            appendicitis_hours = self._number(store, "duration_hours")
+            if not p(store, "fever"):
+                self._add(results, self._candidate(store, ("Acute appendicitis",), ("Appendicitis",), .56, "migrating abdominal pain has the appendicitis pattern but low-grade fever is not documented", [f(store, "periumbilical"), f(store, "right_iliac_fossa"), f(store, "pain_migration"), f(store, "mcburney", "guarding", "rebound")], confidence="low", blockers=("low-grade fever is part of the local appendicitis definition",), missing=("temperature/systemic assessment",)), trace, "appendicitis-fever-missing")
+            elif appendicitis_hours is not None and not 12 <= appendicitis_hours <= 24:
+                self._add(results, self._candidate(store, ("Acute appendicitis",), ("Appendicitis",), .56, "migrating abdominal pain has an atypical documented time course for the local appendicitis definition", [f(store, "periumbilical"), f(store, "right_iliac_fossa"), f(store, "pain_migration"), f(store, "duration_hours")], confidence="low", blockers=("the documented migration time falls outside the twelve-to-twenty-four-hour appendicitis window",)), trace, "appendicitis-time-window")
+            else:
+                self._add(results, self._candidate(store, ("Acute appendicitis",), ("Appendicitis",), .93, "migrating periumbilical to right-iliac-fossa pain with peritoneal findings", [f(store, "periumbilical"), f(store, "right_iliac_fossa"), f(store, "pain_migration"), f(store, "mcburney", "guarding", "rebound")]), trace, "appendicitis")
 
         if p(store, "otalgia") and p(store, "bulging_tm", "erythematous_tm", "opacified_tm"):
             perforated = p(store, "perforated_tm") and p(store, "ear_discharge")
@@ -393,12 +402,22 @@ class CodingPolicy:
 
         migraine_core = p(store, "unilateral") and p(store, "pulsating") and p(store, "moderate_severe") and p(store, "activity_aggravates") and (p(store, "nausea") or (p(store, "photophobia") and p(store, "phonophobia")))
         if migraine_core:
-            self._add(results, self._candidate(store, ("Migraine",), ("Migraine features",), .93, "unilateral pulsating moderate-to-severe activity-aggravated headache with qualifying associated symptoms", [f(store, "unilateral"), f(store, "pulsating"), f(store, "moderate_severe"), f(store, "activity_aggravates"), f(store, "nausea", "photophobia")]), trace, "migraine")
+            duration_hours = self._number(store, "duration_hours")
+            duration_days = self._number(store, "duration_days")
+            outside_duration = (duration_hours is not None and duration_hours > 72) or (duration_days is not None and duration_days >= 3)
+            if p(store, "first_headache_attack") or outside_duration:
+                # The feature pattern remains useful, but recurrence and the
+                # untreated four-to-seventy-two-hour attack window are not
+                # optional. Let the symptom fallback carry the uncertainty.
+                trace.append("migraine-qualification-missing")
+            else:
+                self._add(results, self._candidate(store, ("Migraine",), ("Migraine features",), .93, "unilateral pulsating moderate-to-severe activity-aggravated headache with qualifying associated symptoms", [f(store, "unilateral"), f(store, "pulsating"), f(store, "moderate_severe"), f(store, "activity_aggravates"), f(store, "nausea", "photophobia")]), trace, "migraine")
 
         lower_uti = p(store, "dysuria") and p(store, "urinary_frequency", "urinary_urgency")
         upper_uti = p(store, "loin_pain", "cva_tenderness") or self._at_least(store, "temperature", 38.01)
         renal_colic = p(store, "loin_pain") and p(store, "groin_radiation") and p(store, "colicky") and p(store, "haematuria")
-        if (lower_uti or p(store, "loin_pain", "cva_tenderness") or p(store, "asymptomatic_bacteriuria")) and not renal_colic:
+        upper_context = p(store, "fever", "systemic_upset", "infection")
+        if (lower_uti or p(store, "asymptomatic_bacteriuria") or (p(store, "loin_pain", "cva_tenderness") and upper_context)) and not renal_colic:
             if p(store, "pregnancy"):
                 self._add(results, self._candidate(store, ("Genitourinary infection in pregnancy",), ("Urinary tract infection: management",), .94, "urinary infection in pregnancy is assigned to the pregnancy-related entry", [f(store, "pregnancy"), f(store, "dysuria", "urinary_frequency", "urinary_urgency")]), trace, "pregnancy-uti")
             elif upper_uti:
@@ -431,6 +450,9 @@ class CodingPolicy:
 
         if p(store, "diarrhoea") and not p(store, "blood_stool", "pathogen"):
             self._add(results, self._candidate(store, ("Viral gastroenteritis",), ("Acute gastroenteritis",), .83, "acute diarrhoea with or without vomiting and no blood or documented pathogen", [f(store, "diarrhoea"), f(store, "vomiting")]), trace, "viral-gastroenteritis")
+        elif p(store, "diarrhoea") and p(store, "blood_stool") and not p(store, "pathogen"):
+            store.warnings.append("block_symptom_fallback: bloody diarrhoea requires assessment for invasive infection or gastrointestinal bleeding")
+            trace.append("bloody-diarrhoea-needs-workup")
         if p(store, "diarrhoea") and p(store, "pathogen"):
             self._add(results, self._pathogen_candidate(store, trace), trace, "pathogen-gastroenteritis")
 
@@ -473,10 +495,11 @@ class CodingPolicy:
                 self._add(results, self._candidate(store, ("Severe dengue",) if severe_dengue else ("Dengue fever",), ("Arboviral febrile illness",), .92, "confirmed dengue presentation" + (" with warning features" if severe_dengue else ""), [f(store, "dengue", "fever"), f(store, "dengue_test"), f(store, "warning_sign", "organ_dysfunction")], flags=("urgent_review",) if severe_dengue else ()), trace, "dengue-confirmed")
 
         septic_joint = p(store, "joint_swelling") and p(store, "fever")
-        synovial_result = p(store, "synovial_culture", "synovial_microscopy")
-        if septic_joint and p(store, "aspiration") and synovial_result:
+        synovial_test = p(store, "synovial_culture", "synovial_microscopy")
+        culture_result = p(store, "synovial_culture")
+        if septic_joint and p(store, "aspiration") and culture_result:
             self._add(results, self._candidate(store, ("Septic arthritis",), ("Crystal arthropathy",), .88, "febrile acutely swollen joint with synovial testing and a recorded result", [f(store, "joint_swelling"), f(store, "fever"), f(store, "aspiration"), f(store, "synovial_culture", "synovial_microscopy")]), trace, "septic-arthritis")
-        elif septic_joint and (p(store, "aspiration") or synovial_result):
+        elif septic_joint and (p(store, "aspiration") or synovial_test):
             self._add(results, self._candidate(store, ("Septic arthritis",), ("Crystal arthropathy",), .56, "fever and an acutely swollen joint require synovial results before a septic or crystal assignment", [f(store, "joint_swelling"), f(store, "fever"), f(store, "aspiration"), f(store, "synovial_culture", "synovial_microscopy")], confidence="low", blockers=("synovial microscopy/culture result is pending or not documented",), missing=("definitive synovial fluid result",)), trace, "septic-joint-pending")
         elif p(store, "first_mtp") and p(store, "joint_swelling", "joint_erythema") and p(store, "exquisite_tenderness") and not p(store, "other_joint_site") and not p(store, "fever", "systemic_upset"):
             self._add(results, self._candidate(store, ("Gout",), ("Crystal arthropathy",), .87, "classic first-MTP inflammatory presentation without systemic features", [f(store, "first_mtp"), f(store, "joint_swelling", "joint_erythema"), f(store, "exquisite_tenderness")]), trace, "gout")
@@ -495,8 +518,12 @@ class CodingPolicy:
             else:
                 self._add(results, self._candidate(store, ("Septic arthritis",), ("Atraumatic painful hip",), .52, "atraumatic hip pain is not safely classifiable from the documented findings", [f(store, "hip_pain")], confidence="low", blockers=("age, systemic state, inflammatory markers and ability to bear weight are unresolved",), missing=("age, fever, inflammatory markers and weight-bearing status")), trace, "hip-uncertain")
 
-        if p(store, "jaw_claudication", "scalp_tenderness", "visual_disturbance") and self._at_least(store, "age_years", 50) and p(store, "inflammatory_markers"):
-            store.warnings.append("large-vessel/giant-cell arteritis pattern is outside the supplied catalogue")
+        gca_features = p(store, "jaw_claudication", "scalp_tenderness", "visual_disturbance")
+        if p(store, "headache") and self._at_least(store, "age_years", 50) and gca_features:
+            if p(store, "inflammatory_markers") and p(store, "jaw_claudication", "scalp_tenderness", "visual_disturbance"):
+                store.warnings.append("large-vessel/giant-cell arteritis pattern is outside the supplied catalogue")
+            else:
+                store.warnings.append("large-vessel/giant-cell arteritis remains a concern but required red-flag evidence is incomplete and the condition is outside the supplied catalogue")
             trace.append("large-vessel-vasculitis-gap")
 
         if p(store, "focal_deficit"):
@@ -505,8 +532,10 @@ class CodingPolicy:
             elif p(store, "resolved_deficit"):
                 if self._at_least(store, "episode_count", 2) or p(store, "recurrent_event"):
                     self._add(results, self._candidate(store, ("Cerebral ischaemic stroke",), ("Transient focal neurological deficit",), .68, "recurrent transient focal deficits form a high-risk cerebrovascular presentation", [f(store, "focal_deficit"), f(store, "resolved_deficit"), f(store, "episode_count", "recurrent_event")], confidence="low", blockers=("high-risk recurrent transient syndrome has no dedicated catalogue entry",), flags=("urgent_review",)), trace, "recurrent-tia-gap")
-                else:
+                elif not self._at_least(store, "duration_minutes", 60) and not self._at_least(store, "duration_hours", 1):
                     self._add(results, self._candidate(store, ("Transient ischaemic attack",), ("Transient focal neurological deficit",), .88, "focal deficit resolved completely with no residual sign", [f(store, "focal_deficit"), f(store, "resolved_deficit")]), trace, "tia")
+                else:
+                    self._add(results, self._candidate(store, ("Transient ischaemic attack",), ("Transient focal neurological deficit",), .56, "the focal deficit resolved but its documented duration is outside the usual one-hour TIA window", [f(store, "focal_deficit"), f(store, "resolved_deficit"), f(store, "duration_minutes")], confidence="low", blockers=("a resolved deficit lasting at least one hour requires cerebrovascular review before TIA assignment",), flags=("urgent_review",)), trace, "tia-duration-uncertain")
 
         # Pneumonia uses the active confirmation revision. Clinical evidence is
         # deliberately provisional until consolidation is imaged.
@@ -578,7 +607,7 @@ class CodingPolicy:
         if p(store, "pregnancy") and p(store, "hypertension"):
             after20 = self._at_least(store, "gestational_weeks", 20.01)
             severe = self._at_least(store, "systolic_bp", 160) or self._at_most(store, "platelets", 99.99) or p(store, "pulmonary_oedema", "liver_dysfunction")
-            preeclampsia = after20 and (p(store, "proteinuria", "headache", "visual_disturbance", "ruq_pain", "hyperreflexia") or p(store, "falling_platelets"))
+            preeclampsia = after20 and (p(store, "proteinuria", "headache", "visual_disturbance", "ruq_pain", "hyperreflexia", "liver_dysfunction", "pulmonary_oedema") or p(store, "falling_platelets"))
             if preeclampsia:
                 terms = ("Severe pre-eclampsia",) if severe else ("Pre-eclampsia",)
                 self._add(results, self._candidate(store, terms, ("Hypertensive disorders of pregnancy",), .95 if severe else .91, "new hypertension after twenty weeks with proteinuria or a pre-eclampsia feature", [f(store, "pregnancy"), f(store, "hypertension"), f(store, "gestational_weeks"), f(store, "proteinuria", "headache", "visual_disturbance", "ruq_pain", "hyperreflexia")], flags=("urgent_review",) if severe else ()), trace, "severe-preeclampsia" if severe else "preeclampsia")
@@ -618,7 +647,7 @@ class CodingPolicy:
                 pass  # handled by the emergency branch above
             elif p(store, "night_pain", "weight_loss", "fever", "malignancy_history") or (self._at_least(store, "age_years", 50)):
                 self._add(results, self._candidate(store, ("Low back pain",), ("Lower back pain and its red flags",), .56, "back pain has a red flag requiring investigation before mechanical assignment", [f(store, "low_back_pain"), f(store, "night_pain", "weight_loss", "fever", "malignancy_history"), f(store, "age_years")], confidence="low", blockers=("underlying cause of red-flag back pain is unresolved",), flags=("investigate-underlying-cause",)), trace, "back-red-flag")
-            elif self._at_most(store, "age_years", 49) and not p(store, "focal_deficit", "fever", "weight_loss"):
+            elif self._at_least(store, "age_years", 18) and self._at_most(store, "age_years", 49) and not p(store, "focal_deficit", "fever", "weight_loss"):
                 self._add(results, self._candidate(store, ("Low back pain",), ("Lower back pain and its red flags",), .82, "adult under fifty with mechanical low back pain and no documented red flag", [f(store, "low_back_pain"), f(store, "age_years")]), trace, "mechanical-back-pain")
 
         if p(store, "spreading_erythema") and p(store, "skin_warmth") and not p(store, "pain_disproportionate", "rapid_progression", "skin_anaesthesia", "crepitus", "systemic_toxicity"):
@@ -647,7 +676,10 @@ class CodingPolicy:
         postpartum_days = self._number(store, "postpartum_days")
         fever_observations = len(store.positive("temperature"))
         if p(store, "puerperium") and p(store, "fever") and postpartum_days is not None and 1 < postpartum_days <= 10 and p(store, "uterine_tenderness", "offensive_lochia"):
-            if fever_observations >= 2 or p(store, "fever_two_days") or self._at_least(store, "episode_count", 2):
+            temperature_qualifies = self._number(store, "temperature") is None or self._number(store, "temperature") > 38
+            if not temperature_qualifies:
+                self._add(results, self._candidate(store, ("Puerperal sepsis",), ("Retained products and postpartum fever",), .54, "postpartum fever is documented in the time window but the measured temperature does not exceed 38 degrees", [f(store, "puerperium"), f(store, "fever"), f(store, "postpartum_days"), f(store, "temperature")], confidence="low", blockers=("a qualifying temperature above 38 degrees is required",)), trace, "puerperal-fever-threshold")
+            elif fever_observations >= 2 or p(store, "fever_two_days") or self._at_least(store, "episode_count", 2):
                 self._add(results, self._candidate(store, ("Puerperal sepsis",), ("Retained products and postpartum fever",), .92, "postpartum fever on at least two observations in the defined window with uterine or lochia infection feature", [f(store, "puerperium"), f(store, "fever"), f(store, "postpartum_days"), f(store, "uterine_tenderness", "offensive_lochia")], flags=("urgent_review",)), trace, "puerperal-sepsis")
             else:
                 self._add(results, self._candidate(store, ("Puerperal sepsis",), ("Retained products and postpartum fever",), .54, "one qualifying postpartum fever is documented but the definition requires fever on two days", [f(store, "puerperium"), f(store, "fever"), f(store, "postpartum_days"), f(store, "uterine_tenderness", "offensive_lochia")], confidence="low", blockers=("a second qualifying fever observation/day is missing",), missing=("second fever observation within the first ten days",), flags=("urgent_review",)), trace, "puerperal-sepsis-incomplete")
