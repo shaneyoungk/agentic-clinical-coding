@@ -43,6 +43,17 @@ class EdgeCaseTests(unittest.TestCase):
         self.assertTrue(any("outside the supplied catalogue" in item for item in result["unresolved_reasons"]))
         self.assertEqual(result["problems"][0]["evidence_ledger"][0]["guideline_id"], "GDL-040")
 
+    def test_missing_emergency_entries_are_not_nearest_neighbour_assignments(self) -> None:
+        necrotising = self.result("Pain out of proportion with rapidly progressive redness and skin anaesthesia.")
+        self.assertEqual(necrotising["status"], "unresolved")
+        self.assertEqual(necrotising["assignments"], [])
+        self.assertTrue(any("no dedicated catalogue entry" in item for item in necrotising["unresolved_reasons"]))
+
+        acute_chest = self.result("Known sickle cell disease with fever, chest pain and hypoxia.")
+        self.assertEqual(acute_chest["status"], "unresolved")
+        self.assertEqual(acute_chest["assignments"], [])
+        self.assertTrue(any("acute chest syndrome" in item for item in acute_chest["unresolved_reasons"]))
+
     def test_recurrent_and_incomplete_thresholds_do_not_force_fit(self) -> None:
         recurrent = self.result("Adult woman with dysuria, frequency and urgency; three episodes in twelve months, no fever.")
         self.assertEqual(recurrent["status"], "unresolved")
@@ -58,6 +69,8 @@ class EdgeCaseTests(unittest.TestCase):
         self.assertEqual(assignment["guideline_id"], "GDL-003")
         kinds = {item["kind"] for item in assignment["evidence"]}
         self.assertEqual(kinds, {"catalogue", "guideline", "note"})
+        self.assertEqual(result["note_text"], "A 32-year-old has anterior chest pain with chest wall tenderness and pain worse with movement.")
+        self.assertTrue(result["trace"]["corpus"]["guideline_lifecycle"])
 
     def test_input_parser_preserves_malformed_and_blank_records(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

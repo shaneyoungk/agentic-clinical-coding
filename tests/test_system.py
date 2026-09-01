@@ -9,6 +9,7 @@ from app.corpus import CorpusError, load_corpus
 from app.engine import CodingEngine
 from app.evaluate import evaluate
 from app.io import read_notes
+from app.models import NoteRecord
 from app.text import extract_facts
 
 
@@ -30,12 +31,34 @@ class CorpusTests(unittest.TestCase):
         self.assertNotIn("GDL-017", active)
         self.assertIn("GDL-016", active)
 
+        lifecycle = {item["id"]: item for item in corpus.guideline_lifecycle()}
+        self.assertIn("superseded_by_newer_guidance", lifecycle["GDL-017"]["reasons"])
+        self.assertIn("trust=untrusted", lifecycle["GDL-041"]["reasons"])
+        self.assertIn("status=deprecated", lifecycle["GDL-045"]["reasons"])
+
     def test_external_collision_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "extra.json"
             path.write_text(json.dumps([{"code": "FA31", "title": "Wrong", "chapter": "x", "synonyms": []}]), encoding="utf-8")
             with self.assertRaises(CorpusError):
                 load_corpus(ROOT / "data/icd_catalog.json", ROOT / "data/guideline_snippets.json", extra_catalogue_paths=(path,))
+
+    def test_separate_sourced_addition_preserves_metadata_and_closes_gap(self) -> None:
+        corpus = load_corpus(
+            ROOT / "data/icd_catalog.json",
+            ROOT / "data/guideline_snippets.json",
+            extra_catalogue_paths=(ROOT / "data/additions/icd_catalog_additions.json",),
+            extra_guideline_paths=(ROOT / "data/additions/guideline_additions.json",),
+        )
+        entry = corpus.code_by_code["1B71"]
+        self.assertEqual(entry.code_system, "http://id.who.int/icd/release/11/mms")
+        self.assertEqual(entry.version, "2025-01")
+        self.assertIn("EXT-WHO-MALARIA-001", {item.id for item in corpus.active_guidelines()})
+
+        note = "Pain out of proportion with rapidly progressive redness and skin anaesthesia."
+        result = CodingEngine(corpus).process(NoteRecord("gap-added", note, 1)).as_dict()
+        self.assertEqual([item["code"] for item in result["assignments"]], ["1B71"])
+        self.assertEqual(result["assignments"][0]["code_system"], "http://id.who.int/icd/release/11/mms")
 
 
 class FactTests(unittest.TestCase):
