@@ -7,6 +7,7 @@ from pathlib import Path
 
 from app.corpus import CorpusError, load_corpus
 from app.engine import CodingEngine
+from app.evaluate import evaluate
 from app.io import read_notes
 from app.text import extract_facts
 
@@ -68,6 +69,12 @@ class DecisionTests(unittest.TestCase):
         notes = read_notes(ROOT / "tests/fixtures/smoke_notes.jsonl")
         outputs = [engine().process(note).as_dict() for note in notes]
         self.assertEqual([record["input_position"] for record in outputs], list(range(1, len(notes) + 1)))
+
+    def test_unseen_holdout_regression(self) -> None:
+        report = evaluate(ROOT / "benchmark/unseen_notes.jsonl", ROOT / "benchmark/unseen_expected.json")
+        self.assertEqual(report["notes"], 35)
+        self.assertEqual(report["exact_code_accuracy"], 1.0)
+        self.assertEqual(report["accounted_rate"], 1.0)
 
 
 if __name__ == "__main__":
