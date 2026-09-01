@@ -84,7 +84,6 @@ class Corpus:
                 continue
             replacement_tail = body[marker.end():]
             replacement_terms = _content_terms(replacement_tail)
-            newer_topic = _content_terms(f"{newer.title} {newer.source}")
             for older in eligible:
                 if older.id == newer.id or older.effective_key >= newer.effective_key:
                     continue
@@ -144,7 +143,15 @@ def _metadata_for_guideline(record: dict[str, Any]) -> tuple[str, str]:
     ).lower()
     derived_status = "deprecated" if "deprecated" in haystack or "historical reference" in haystack else "active"
     derived_trust = "untrusted" if any(
-        marker in haystack for marker in ("unsigned", "system directive", "processing assistant")
+        marker in haystack for marker in (
+            "unsigned",
+            "system directive",
+            "processing assistant",
+            "ignore previous instructions",
+            "disregard conflicting guidance",
+            "omit the evidence",
+            "instruction takes precedence",
+        )
     ) else "normal"
     # Explicit metadata may add lifecycle information, but it cannot make a
     # record active/trusted when its own content carries a clear downgrade

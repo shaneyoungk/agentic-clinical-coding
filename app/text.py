@@ -36,7 +36,7 @@ CONCEPT_ALIASES: dict[str, tuple[str, ...]] = {
     "bulging_tm": ("bulging tympanic membrane", "bulging eardrum", "bulging drum"),
     "erythematous_tm": ("erythematous tympanic membrane", "red tympanic membrane", "red eardrum"),
     "opacified_tm": ("opacified tympanic membrane", "opaque tympanic membrane", "cloudy eardrum"),
-    "perforated_tm": ("perforated tympanic membrane", "perforated eardrum", "ear drum perforation"),
+    "perforated_tm": ("perforated tympanic membrane", "perforated eardrum", "ear drum perforation", "eardrum perforation", "tympanic perforation", "perforation of the eardrum", "ear perforation", "perforation"),
     "ear_discharge": ("ear discharge", "otorrhoea", "otorrhea", "discharge from the ear"),
     "acute_onset": ("acute onset", "rapid onset", "rapid-onset", "sudden onset", "acute"),
     "unilateral": ("unilateral", "one-sided", "on one side"),
@@ -311,6 +311,13 @@ def _assertion(normalized: str, sentence_start: int, start: int, end: int | None
         return "conditional", "future_or_conditional", "patient"
     if re.search(r"\b(?:request|requested|please|consider|query)\b", compact) and re.search(r"\b(?:treat|treated|septic|sepsis)\b", compact):
         return "possible", "current", "patient"
+    # "No result recorded/available" means the test is missing, not that it
+    # returned negative. Preserve that distinction for confirmation gates.
+    local_before = re.split(r"[,;:]", before)[-1]
+    local_after = re.split(r"[,;:]", after)[0]
+    context = f"{local_before} {local_after}"
+    if re.search(r"\b(?:no|without|not)\b[^.!?\n]{0,90}\b(?:result|recorded|available|performed|done)\b", context):
+        return "possible", "current", "patient"
     if re.search(r"\b(?:no|not|denies|denied|without|absent|absence of|negative for|negative|never|afebrile|nil)\b[^.!?\n]{0,75}$", compact):
         return "absent", "current", "patient"
     if re.search(r"\b(?:possible|probable|suspected|query|consider|rule out)\b", compact) or re.search(r"\?\s*$", compact):
@@ -413,6 +420,10 @@ def _add_numeric_facts(store: FactStore) -> None:
         (rf"\bfor\s*({num})\s*(hours?|hrs?|h)\b", "duration_hours", "hours"),
         (rf"\bfor\s*({num})\s*(days?|d)\b", "duration_days", "days"),
         (rf"\bfor\s*({num})\s*(months?|mos?)\b", "duration_months", "months"),
+        (rf"\b(?:lasting|lasted|persisting|persisted|duration(?: of)?)\s*({num})\s*(hours?|hrs?|h)\b", "duration_hours", "hours"),
+        (rf"\b(?:lasting|lasted|persisting|persisted|duration(?: of)?)\s*({num})\s*(days?|d)\b", "duration_days", "days"),
+        (rf"\b(?:lasting|lasted|persisting|persisted|duration(?: of)?)\s*({num})\s*(months?|mos?)\b", "duration_months", "months"),
+        (rf"\b(?:settled|settles|resolved|resolves|subsided|subsides)\s+after\s+({num})\s*(hours?|hrs?|h)\b", "duration_hours", "hours"),
         (rf"\b({num})\s*(?:or more|\+)\s*(?:episodes?|attacks?|events?)\b", "episode_count", "episodes"),
         (rf"\b({num})\s*(?:episodes?|attacks?|events?)\b", "episode_count", "episodes"),
         (rf"\b({num})\s*pack[- ]years?\b", "pack_years", "pack-years"),

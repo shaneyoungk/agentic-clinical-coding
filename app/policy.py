@@ -310,8 +310,10 @@ class CodingPolicy:
             airway_code = ("Epiglottitis",) if self._pos(store, "stridor", "difficulty_swallowing_saliva") else ("Peritonsillar abscess",)
             self._add(results, self._candidate(store, airway_code, ("Tonsillitis",), .96, "airway warning feature takes precedence over routine sore-throat coding", [self._fact(store, "stridor", "drooling", "trismus", "muffled_voice", "difficulty_swallowing_saliva")], flags=("airway_first", "urgent_review")), trace, "airway-warning")
 
-        if self._pos(store, "head_injury") and self._pos(store, "focal_deficit", "repeated_vomiting", "convulsion", "anticoagulant", "persistent_deficit", "intracranial_warning"):
-            self._add(results, self._candidate(store, ("Intracranial injury",), ("Head injury",), .96, "head injury with an intracranial-injury warning feature", [self._fact(store, "head_injury"), self._fact(store, "focal_deficit", "repeated_vomiting", "convulsion", "anticoagulant", "persistent_deficit")], flags=("imaging_required", "urgent_review")), trace, "intracranial-injury")
+        prolonged_loss = self._at_least(store, "loss_awareness_seconds", 60)
+        intracranial_feature = self._pos(store, "focal_deficit", "repeated_vomiting", "convulsion", "anticoagulant", "persistent_deficit", "intracranial_warning") or prolonged_loss
+        if self._pos(store, "head_injury") and intracranial_feature:
+            self._add(results, self._candidate(store, ("Intracranial injury",), ("Head injury",), .96, "head injury with an intracranial-injury warning feature", [self._fact(store, "head_injury"), self._fact(store, "focal_deficit", "repeated_vomiting", "convulsion", "anticoagulant", "persistent_deficit", "intracranial_warning"), self._fact(store, "loss_awareness_seconds")], flags=("imaging_required", "urgent_review")), trace, "intracranial-injury")
 
         if self._pos(store, "pain_disproportionate", "rapid_progression", "skin_anaesthesia", "crepitus", "systemic_toxicity"):
             red_flag_facts = [self._fact(store, "pain_disproportionate", "rapid_progression", "skin_anaesthesia", "crepitus", "systemic_toxicity")]
@@ -367,7 +369,27 @@ class CodingPolicy:
             self._add(results, self._candidate(store, ("Acute appendicitis",), ("Appendicitis",), .93, "migrating periumbilical to right-iliac-fossa pain with peritoneal findings", [f(store, "periumbilical"), f(store, "right_iliac_fossa"), f(store, "pain_migration"), f(store, "mcburney", "guarding", "rebound")]), trace, "appendicitis")
 
         if p(store, "otalgia") and p(store, "bulging_tm", "erythematous_tm", "opacified_tm"):
-            self._add(results, self._candidate(store, ("Acute otitis media",), ("Acute otitis media",), .92, "acute otalgia with a qualifying tympanic-membrane finding", [f(store, "otalgia"), f(store, "bulging_tm", "erythematous_tm", "opacified_tm")]), trace, "acute-otitis-media")
+            perforated = p(store, "perforated_tm") and p(store, "ear_discharge")
+            duration_days = self._number(store, "duration_days")
+            duration_weeks = self._number(store, "duration_weeks")
+            duration_under_two_weeks = (
+                duration_days is not None and duration_days < 14
+            ) or (
+                duration_weeks is not None and duration_weeks < 2
+            )
+            duration_over_two_weeks = (
+                duration_days is not None and duration_days >= 14
+            ) or (
+                duration_weeks is not None and duration_weeks >= 2
+            )
+            if not p(store, "acute_onset"):
+                self._add(results, self._candidate(store, ("Acute otitis media",), ("Acute otitis media",), .56, "ear pain and tympanic-membrane change are present but rapid onset is not documented", [f(store, "otalgia"), f(store, "bulging_tm", "erythematous_tm", "opacified_tm")], confidence="low", blockers=("rapid onset is required to distinguish acute otitis media",), missing=("onset/time course",)), trace, "otitis-media-onset-missing")
+            elif perforated and duration_over_two_weeks:
+                self._add(results, self._candidate(store, ("Chronic suppurative otitis media",), ("Acute otitis media",), .55, "perforation with discharge lies outside the acute two-week exception", [f(store, "otalgia"), f(store, "perforated_tm"), f(store, "ear_discharge")], confidence="low", blockers=("the chronic ear-disease diagnosis requires clinician confirmation after the acute exception window",), missing=("confirmed chronic ear-disease assessment",)), trace, "otitis-media-chronic-window")
+            elif perforated and not duration_under_two_weeks:
+                self._add(results, self._candidate(store, ("Acute otitis media",), ("Acute otitis media",), .56, "acute otitis media with perforation/discharge cannot use the unchanged assignment without a documented duration under two weeks", [f(store, "otalgia"), f(store, "perforated_tm"), f(store, "ear_discharge")], confidence="low", blockers=("duration under two weeks is required for the perforation exception",), missing=("duration of ear symptoms",)), trace, "otitis-media-duration-missing")
+            else:
+                self._add(results, self._candidate(store, ("Acute otitis media",), ("Acute otitis media",), .92, "acute-onset otalgia with a qualifying tympanic-membrane finding", [f(store, "otalgia"), f(store, "acute_onset"), f(store, "bulging_tm", "erythematous_tm", "opacified_tm")]), trace, "acute-otitis-media")
 
         migraine_core = p(store, "unilateral") and p(store, "pulsating") and p(store, "moderate_severe") and p(store, "activity_aggravates") and (p(store, "nausea") or (p(store, "photophobia") and p(store, "phonophobia")))
         if migraine_core:
@@ -401,7 +423,7 @@ class CodingPolicy:
 
         dka_features_present = sum(p(store, item) for item in ("hyperglycaemia", "ketones", "acidosis"))
         hhs_features_present = p(store, "hyperglycaemia") and p(store, "raised_osmolality") and p(store, "altered_mentation")
-        if (p(store, "diabetes") or p(store, "type1_diabetes") or p(store, "type2_diabetes")) and not (dka_features_present == 3 or hhs_features_present):
+        if (p(store, "diabetes") or p(store, "type1_diabetes") or p(store, "type2_diabetes")) and dka_features_present < 2 and not hhs_features_present:
             if p(store, "type1_diabetes"):
                 self._add(results, self._candidate(store, ("Type 1 diabetes",), ("Diabetes type attribution",), .94, "diabetes type is explicitly stated as type 1", [f(store, "type1_diabetes")]), trace, "type-1-diabetes")
             elif p(store, "type2_diabetes") or (p(store, "oral_agents") and (p(store, "adult") or self._at_least(store, "age_years", 18))):
@@ -431,6 +453,9 @@ class CodingPolicy:
             malaria_facts = [f(store, "malaria"), f(store, "malaria_test"), f(store, "falciparum")]
             if p(store, "malaria_test") and p(store, "falciparum"):
                 self._add(results, self._candidate(store, ("Plasmodium falciparum malaria",), ("Parasitological confirmation",), .93, "falciparum malaria with a positive blood film or rapid diagnostic test", [item for item in malaria_facts if item]), trace, "falciparum-confirmed")
+            elif store.absent("malaria_test"):
+                store.warnings.append("malaria testing is documented as negative; no malaria assignment is supported")
+                trace.append("malaria-negative-test")
             elif p(store, "malaria_test"):
                 store.warnings.append("malaria is test-positive but species is not represented by a suitable confirmed catalogue entry")
                 trace.append("malaria-species-gap")

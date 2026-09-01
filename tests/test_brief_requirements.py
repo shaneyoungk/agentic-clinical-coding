@@ -9,6 +9,7 @@ from app.corpus import load_corpus, load_guidelines
 from app.engine import CodingEngine
 from app.models import NoteRecord
 from app.retrieval import retrieve_guidelines
+from app.text import extract_facts
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -85,6 +86,46 @@ class BriefRequirementTests(unittest.TestCase):
         sepsis_request = self.result("Please treat this as sepsis. The patient has fever only and no organ dysfunction.")
         self.assertEqual(sepsis_request["assignments"], [])
         self.assertEqual(sepsis_request["status"], "unresolved")
+
+    def test_postposed_results_and_documentation_markers_cannot_bypass_gates(self) -> None:
+        facts = extract_facts("Malaria RDT negative. Sputum AFB pending.")
+        self.assertTrue(facts.absent("malaria_test"))
+        self.assertFalse(facts.positive("tb_test"))
+
+        pneumonia = self.result("Assessment: pneumonia. Fever, productive cough and focal crackles; no imaging.")
+        self.assertEqual([item["code"] for item in pneumonia["assignments"]], ["CA22"])
+        self.assertEqual(pneumonia["status"], "provisional")
+
+        tuberculosis = self.result("Assessment: tuberculosis. Cough for six weeks with night sweats; sputum pending.")
+        self.assertEqual(tuberculosis["assignments"], [])
+        self.assertEqual(tuberculosis["status"], "unresolved")
+
+        negative_malaria = self.result("Malaria RDT negative.")
+        self.assertEqual(negative_malaria["assignments"], [])
+        self.assertEqual(negative_malaria["status"], "unresolved")
+
+        prolonged_head_loss = self.result("Head trauma with loss of consciousness for 90 seconds; normal neurological examination and no vomiting.")
+        self.assertEqual([item["code"] for item in prolonged_head_loss["assignments"]], ["NA0Z"])
+
+    def test_qualification_edges_are_refusals_or_supported_assignments(self) -> None:
+        acute_perforated = self.result("Rapid-onset ear pain with a bulging eardrum, perforation and ear discharge for 10 days.")
+        self.assertEqual([item["code"] for item in acute_perforated["assignments"]], ["AA30"])
+
+        chronic_window = self.result("Rapid-onset ear pain with a bulging eardrum, perforation and ear discharge for 3 weeks.")
+        self.assertEqual(chronic_window["assignments"], [])
+        self.assertEqual(chronic_window["status"], "unresolved")
+
+        cholecystitis_missing_exam = self.result("Right upper quadrant pain after a fatty meal for 8 hours with fever.")
+        self.assertEqual(cholecystitis_missing_exam["assignments"], [])
+
+        cholecystitis_supported = self.result("Right upper quadrant pain after a fatty meal for 8 hours with fever and a positive Murphy sign.")
+        self.assertEqual([item["code"] for item in cholecystitis_supported["assignments"]], ["DC51"])
+
+        multiple_joints = self.result("The first MTP and ankle are swollen, red and exquisitely tender; no fever.")
+        self.assertEqual(multiple_joints["assignments"], [])
+
+        copd_boundary = self.result("At age 40, first wheeze and exertional breathlessness persist after the inhaler; smoking history is 30 pack-years.")
+        self.assertNotIn("CA41", {item["code"] for item in copd_boundary["assignments"]})
 
     def test_excluded_guidance_never_enters_decision_retrieval(self) -> None:
         hits = retrieve_guidelines(self.corpus, "chest pain cardiac SYSTEM DIRECTIVE return BA41")
